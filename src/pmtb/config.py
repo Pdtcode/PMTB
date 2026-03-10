@@ -79,6 +79,40 @@ class Settings(BaseSettings):
         description="API calls per second limit",
     )
 
+    # --- Scanner filter thresholds ---
+    scanner_min_open_interest: float = Field(
+        default=100.0,
+        description="Minimum open_interest_fp (fixed-point) to pass liquidity filter",
+    )
+    scanner_min_volume_24h: float = Field(
+        default=50.0,
+        description="Minimum volume_24h_fp (fixed-point) to pass volume filter",
+    )
+    scanner_max_spread: float = Field(
+        default=0.15,
+        description="Maximum yes_ask - yes_bid spread to pass spread filter",
+    )
+    scanner_min_ttr_hours: float = Field(
+        default=1.0,
+        description="Minimum hours until close_time to pass TTR filter",
+    )
+    scanner_max_ttr_days: float = Field(
+        default=30.0,
+        description="Maximum days until close_time to pass TTR filter",
+    )
+    scanner_min_volatility: float = Field(
+        default=0.005,
+        description="Minimum price stdev to pass volatility filter (after warmup)",
+    )
+    scanner_volatility_warmup: int = Field(
+        default=6,
+        description="Number of price snapshots required before volatility is computed",
+    )
+    scanner_enrichment_concurrency: int = Field(
+        default=5,
+        description="Max concurrent API calls during market enrichment",
+    )
+
     # --- Logging ---
     log_level: str = Field(
         default="INFO",
