@@ -48,7 +48,10 @@ Plans:
   2. Markets below liquidity, volume, or spread thresholds are filtered out and the filtered count is logged; threshold values are configurable without code changes
   3. Markets too close or too far from resolution are excluded by the time-to-resolution filter
   4. The scanner outputs a typed list of MarketCandidate objects that downstream pipeline stages consume without additional parsing or validation
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 02-01-PLAN.md — Scanner type contracts (MarketCandidate, ScanResult), filter functions, and config fields
+- [ ] 02-02-PLAN.md — MarketScanner class with pagination, DB upsert, filter chain, enrichment, and scan loop
 
 ### Phase 3: Research Signal Pipeline
 **Goal**: For each candidate market, all four research sources run in parallel and produce a normalized SignalBundle — the pipeline continues gracefully when any single source fails or times out
@@ -115,7 +118,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 4/4 | Complete   | 2026-03-10 |
-| 2. Market Scanner | 0/TBD | Not started | - |
+| 2. Market Scanner | 0/2 | Not started | - |
 | 3. Research Signal Pipeline | 0/TBD | Not started | - |
 | 4. Probability Model | 0/TBD | Not started | - |
 | 5. Decision Layer | 0/TBD | Not started | - |
