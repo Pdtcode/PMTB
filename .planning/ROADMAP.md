@@ -78,7 +78,11 @@ Plans:
   2. Claude API is only called for markets where XGBoost confidence falls in the 0.4–0.6 band; a run over 100 candidate markets shows a Claude call rate well below 100%
   3. The model outputs a typed PredictionResult with p_model, confidence interval, and contributing signal weights for every candidate market
   4. All predictions are persisted to PostgreSQL with the model version and timestamp, visible after a pipeline run
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 04-01-PLAN.md — Prediction types (PredictionResult), feature builder, XGBoost classifier with calibration and persistence
+- [ ] 04-02-PLAN.md — Claude LLM predictor, probability combiner (log-odds/weighted avg), confidence interval computation
+- [ ] 04-03-PLAN.md — ProbabilityPipeline orchestrator with cold-start/hybrid mode, LLM gating, DB persistence
 
 ### Phase 5: Decision Layer
 **Goal**: Every trade candidate passes through three sequential gates — edge detection rejects sub-threshold opportunities, Kelly sizing produces a survivable position size, and the risk manager enforces hard portfolio limits with an independent watchdog that cannot be bypassed by exceptions in the main loop
@@ -125,7 +129,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Infrastructure Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Market Scanner | 2/2 | Complete   | 2026-03-10 |
 | 3. Research Signal Pipeline | 4/4 | Complete   | 2026-03-10 |
-| 4. Probability Model | 0/TBD | Not started | - |
+| 4. Probability Model | 0/3 | Not started | - |
 | 5. Decision Layer | 0/TBD | Not started | - |
 | 6. Execution, Integration, and Deployment | 0/TBD | Not started | - |
 | 7. Performance Tracking and Learning Loop | 0/TBD | Not started | - |
