@@ -261,6 +261,30 @@ class ModelOutput(Base):
     market: Mapped["Market"] = relationship("Market", back_populates="model_outputs")
 
 
+class TradingState(Base):
+    """
+    Key-value store for trading system halt/resume signaling and peak portfolio tracking.
+
+    Designed for a small number of singleton rows (e.g., 'halted', 'peak_value').
+    Primary key is the key string — O(1) lookup, no UUID needed.
+    """
+
+    __tablename__ = "trading_state"
+
+    key: Mapped[str] = mapped_column(String, primary_key=True)
+    """State key — e.g. 'halted', 'peak_portfolio_value'."""
+
+    value: Mapped[str] = mapped_column(String, nullable=False)
+    """Serialized state value — booleans as 'true'/'false', floats as string."""
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+
+
 class PerformanceMetric(Base):
     """
     Aggregated performance metrics (Sharpe ratio, win rate, PnL, etc.).

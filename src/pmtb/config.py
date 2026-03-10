@@ -155,6 +155,24 @@ class Settings(BaseSettings):
         description="RSS feed URLs by market category",
     )
 
+    # --- Risk management settings (decision layer) ---
+    max_exposure: float = Field(
+        default=0.80,
+        description="Maximum total portfolio exposure as fraction of portfolio value",
+    )
+    max_single_bet: float = Field(
+        default=0.05,
+        description="Maximum single bet size as fraction of portfolio value",
+    )
+    var_limit: float = Field(
+        default=0.20,
+        description="Maximum portfolio VaR as fraction of portfolio value",
+    )
+    hedge_shift_threshold: float = Field(
+        default=0.03,
+        description="Edge reversal threshold to trigger auto-hedge",
+    )
+
     # --- Prediction model settings ---
     prediction_min_training_samples: int = Field(
         default=100,
