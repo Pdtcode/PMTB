@@ -12,7 +12,7 @@ PMTB is built as a linear multi-agent async pipeline: scan Kalshi markets, gathe
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Infrastructure Foundation** - Kalshi API client, PostgreSQL schema, async DB layer, configuration, paper trading mode, and structured logging
+- [x] **Phase 1: Infrastructure Foundation** - Kalshi API client, PostgreSQL schema, async DB layer, configuration, paper trading mode, and structured logging (completed 2026-03-10)
 - [ ] **Phase 2: Market Scanner** - Scan all Kalshi markets and filter candidates by liquidity, volume, spread, time-to-resolution, and volatility
 - [ ] **Phase 3: Research Signal Pipeline** - Parallel async research agents (Twitter/X, Reddit, RSS, Google Trends) with NLP classification and signal persistence
 - [ ] **Phase 4: Probability Model** - XGBoost classifier with calibration, gated Claude LLM reasoning, and Bayesian updating into final p_model
@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Alembic migrations run cleanly from scratch and produce the full database schema with all tables for trades, signals, model outputs, and metrics
   4. Configuration values (edge threshold, Kelly alpha, max drawdown) are loaded from environment variables and YAML; changing a value in config takes effect without code changes
   5. Paper trading mode can be toggled via config and routes all order calls to a no-op handler instead of the live Kalshi API
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [ ] 01-01-PLAN.md — Project scaffolding, config, DB layer, logging, metrics
 - [ ] 01-02-PLAN.md — Kalshi REST client with RSA-PSS auth and retry
@@ -114,7 +114,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure Foundation | 3/4 | In Progress|  |
+| 1. Infrastructure Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Market Scanner | 0/TBD | Not started | - |
 | 3. Research Signal Pipeline | 0/TBD | Not started | - |
 | 4. Probability Model | 0/TBD | Not started | - |
