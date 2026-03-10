@@ -134,13 +134,74 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| *(populated by roadmapper)* | | |
+| INFR-01 | Phase 1 | Pending |
+| INFR-02 | Phase 1 | Pending |
+| INFR-03 | Phase 1 | Pending |
+| INFR-04 | Phase 1 | Pending |
+| INFR-05 | Phase 1 | Pending |
+| INFR-06 | Phase 1 | Pending |
+| INFR-07 | Phase 1 | Pending |
+| INFR-08 | Phase 1 | Pending |
+| SCAN-01 | Phase 2 | Pending |
+| SCAN-02 | Phase 2 | Pending |
+| SCAN-03 | Phase 2 | Pending |
+| SCAN-04 | Phase 2 | Pending |
+| SCAN-05 | Phase 2 | Pending |
+| SCAN-06 | Phase 2 | Pending |
+| SCAN-07 | Phase 2 | Pending |
+| RSRCH-01 | Phase 3 | Pending |
+| RSRCH-02 | Phase 3 | Pending |
+| RSRCH-03 | Phase 3 | Pending |
+| RSRCH-04 | Phase 3 | Pending |
+| RSRCH-05 | Phase 3 | Pending |
+| RSRCH-06 | Phase 3 | Pending |
+| RSRCH-07 | Phase 3 | Pending |
+| RSRCH-08 | Phase 3 | Pending |
+| RSRCH-09 | Phase 3 | Pending |
+| PRED-01 | Phase 4 | Pending |
+| PRED-02 | Phase 4 | Pending |
+| PRED-03 | Phase 4 | Pending |
+| PRED-04 | Phase 4 | Pending |
+| PRED-05 | Phase 4 | Pending |
+| PRED-06 | Phase 4 | Pending |
+| PRED-07 | Phase 4 | Pending |
+| EDGE-01 | Phase 5 | Pending |
+| EDGE-02 | Phase 5 | Pending |
+| EDGE-03 | Phase 5 | Pending |
+| EDGE-04 | Phase 5 | Pending |
+| SIZE-01 | Phase 5 | Pending |
+| SIZE-02 | Phase 5 | Pending |
+| SIZE-03 | Phase 5 | Pending |
+| RISK-01 | Phase 5 | Pending |
+| RISK-02 | Phase 5 | Pending |
+| RISK-03 | Phase 5 | Pending |
+| RISK-04 | Phase 5 | Pending |
+| RISK-05 | Phase 5 | Pending |
+| RISK-06 | Phase 5 | Pending |
+| RISK-07 | Phase 5 | Pending |
+| RISK-08 | Phase 5 | Pending |
+| EXEC-01 | Phase 6 | Pending |
+| EXEC-02 | Phase 6 | Pending |
+| EXEC-03 | Phase 6 | Pending |
+| EXEC-04 | Phase 6 | Pending |
+| EXEC-05 | Phase 6 | Pending |
+| DEPL-01 | Phase 6 | Pending |
+| DEPL-02 | Phase 6 | Pending |
+| DEPL-03 | Phase 6 | Pending |
+| PERF-01 | Phase 7 | Pending |
+| PERF-02 | Phase 7 | Pending |
+| PERF-03 | Phase 7 | Pending |
+| PERF-04 | Phase 7 | Pending |
+| PERF-05 | Phase 7 | Pending |
+| PERF-06 | Phase 7 | Pending |
+| PERF-07 | Phase 7 | Pending |
+| PERF-08 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 45 total
-- Mapped to phases: 0
-- Unmapped: 45 ⚠️
+- v1 requirements: 62 total
+- Mapped to phases: 62
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after initial definition*
+*Last updated: 2026-03-09 after roadmap creation*
