@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Market Scanner** - Scan all Kalshi markets and filter candidates by liquidity, volume, spread, time-to-resolution, and volatility (completed 2026-03-10)
 - [x] **Phase 3: Research Signal Pipeline** - Parallel async research agents (Twitter/X, Reddit, RSS, Google Trends) with NLP classification and signal persistence (completed 2026-03-10)
 - [x] **Phase 4: Probability Model** - XGBoost classifier with calibration, gated Claude LLM reasoning, and Bayesian updating into final p_model (completed 2026-03-10)
-- [ ] **Phase 5: Decision Layer** - Edge detection, fractional Kelly sizing, and multi-layer risk management with independent circuit breaker
+- [x] **Phase 5: Decision Layer** - Edge detection, fractional Kelly sizing, and multi-layer risk management with independent circuit breaker (completed 2026-03-10)
 - [ ] **Phase 6: Execution, Integration, and Deployment** - Order placement, fill tracking, end-to-end pipeline wiring, paper trading validation, and Docker deployment
 - [ ] **Phase 7: Performance Tracking and Learning Loop** - Brier score, Sharpe, losing trade analysis, automated XGBoost retraining, and backtesting engine
 
@@ -94,7 +94,7 @@ Plans:
   3. When simulated portfolio drawdown is forced above 8%, all new orders are blocked at the risk manager — even if the main loop continues running
   4. An independent watchdog process detects the 8% drawdown breach and halts trading even when the main process is unresponsive or hung
   5. The position tracker reflects all open positions in real time; a duplicate bet on the same market is detected and blocked before order placement
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 05-01-PLAN.md — Decision types, EdgeDetector, KellySizer, Settings fields, TradingState migration
 - [ ] 05-02-PLAN.md — PositionTracker and RiskManager with portfolio limits, VaR, drawdown, hedge, duplicate detection
@@ -134,6 +134,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Market Scanner | 2/2 | Complete   | 2026-03-10 |
 | 3. Research Signal Pipeline | 4/4 | Complete   | 2026-03-10 |
 | 4. Probability Model | 3/3 | Complete   | 2026-03-10 |
-| 5. Decision Layer | 2/3 | In Progress|  |
+| 5. Decision Layer | 3/3 | Complete   | 2026-03-10 |
 | 6. Execution, Integration, and Deployment | 0/TBD | Not started | - |
 | 7. Performance Tracking and Learning Loop | 0/TBD | Not started | - |

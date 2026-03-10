@@ -69,7 +69,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **RISK-02**: System enforces maximum single-bet size limit
 - [x] **RISK-03**: System computes 95% Value at Risk: VaR = μ − 1.645σ
 - [x] **RISK-04**: System halts all trading when portfolio drawdown exceeds 8%
-- [ ] **RISK-05**: Circuit breaker is architecturally independent — watchdog process that can halt trading even if main loop is hung
+- [x] **RISK-05**: Circuit breaker is architecturally independent — watchdog process that can halt trading even if main loop is hung
 - [x] **RISK-06**: Position tracker maintains real-time view of all open positions and total exposure
 - [x] **RISK-07**: System auto-hedges when odds shift significantly against an open position
 - [x] **RISK-08**: System detects and prevents duplicate bets on the same market
@@ -176,7 +176,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RISK-02 | Phase 5 | Complete |
 | RISK-03 | Phase 5 | Complete |
 | RISK-04 | Phase 5 | Complete |
-| RISK-05 | Phase 5 | Pending |
+| RISK-05 | Phase 5 | Complete |
 | RISK-06 | Phase 5 | Complete |
 | RISK-07 | Phase 5 | Complete |
 | RISK-08 | Phase 5 | Complete |
