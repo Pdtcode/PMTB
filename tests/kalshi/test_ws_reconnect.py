@@ -10,14 +10,25 @@ Tests verify:
 - Auto-reconnect on OSError (5-second sleep)
 - Subscription includes market_ticker
 - WS URL selected by trading_mode (paper vs live)
+
+Each test terminates the infinite run() loop by raising _StopTest after
+the assertion point — a sentinel exception caught outside the mocked block.
 """
 from __future__ import annotations
 
 import json
-from unittest.mock import AsyncMock, MagicMock, patch, call
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 import websockets.exceptions
+
+
+# ---------------------------------------------------------------------------
+# Sentinel to terminate the infinite while-True loop in tests
+# ---------------------------------------------------------------------------
+
+class _StopTest(Exception):
+    """Raised by mocks to break out of the run() while loop during tests."""
 
 
 # ---------------------------------------------------------------------------
@@ -34,18 +45,27 @@ def _make_settings(trading_mode: str = "paper") -> MagicMock:
     return s
 
 
-def _make_ws_mock(messages: list | None = None) -> AsyncMock:
-    """Return an AsyncMock that behaves like a websocket connection."""
+def _make_ws_mock(messages: list | None = None, then_raise=None) -> AsyncMock:
+    """
+    Return an AsyncMock that behaves like a websocket connection.
+
+    Args:
+        messages:    Messages to yield before terminating.
+        then_raise:  Exception to raise after messages are exhausted.
+                     Defaults to _StopTest to terminate the run() loop.
+    """
     ws = AsyncMock()
     ws.send = AsyncMock()
 
-    # Async iterator over messages, then StopAsyncIteration
     if messages is None:
         messages = []
+    if then_raise is None:
+        then_raise = _StopTest()
 
     async def _aiter():
         for m in messages:
             yield m
+        raise then_raise
 
     ws.__aiter__ = lambda self: _aiter()
     return ws
@@ -67,7 +87,6 @@ async def test_connect_uses_signed_headers():
          patch("pmtb.kalshi.ws_client.build_kalshi_headers", return_value={"KALSHI-ACCESS-KEY": "k"}) as mock_headers, \
          patch("pmtb.kalshi.ws_client.websockets.connect") as mock_connect:
 
-        # Make context manager return ws_mock
         mock_connect.return_value.__aenter__ = AsyncMock(return_value=ws_mock)
         mock_connect.return_value.__aexit__ = AsyncMock(return_value=False)
 
@@ -76,7 +95,8 @@ async def test_connect_uses_signed_headers():
         messages_received = []
         async def on_message(msg): messages_received.append(msg)
 
-        await client.run(on_message, channels=["orderbook_delta"], market_tickers=["SOME-TICKER"])
+        with pytest.raises(_StopTest):
+            await client.run(on_message, channels=["orderbook_delta"], market_tickers=["SOME-TICKER"])
 
         # build_kalshi_headers must have been called
         mock_headers.assert_called_once()
@@ -110,7 +130,8 @@ async def test_subscribes_after_connect():
         mock_connect.return_value.__aexit__ = AsyncMock(return_value=False)
 
         client = KalshiWSClient(settings)
-        await client.run(AsyncMock(), channels=["orderbook_delta", "fill"], market_tickers=["TICKER-1"])
+        with pytest.raises(_StopTest):
+            await client.run(AsyncMock(), channels=["orderbook_delta", "fill"], market_tickers=["TICKER-1"])
 
         ws_mock.send.assert_called_once()
         sent_payload = json.loads(ws_mock.send.call_args[0][0])
@@ -144,7 +165,8 @@ async def test_messages_routed_to_callback():
         received = []
         async def on_message(msg): received.append(msg)
 
-        await client.run(on_message, channels=["orderbook_delta"], market_tickers=["X-Y-Z"])
+        with pytest.raises(_StopTest):
+            await client.run(on_message, channels=["orderbook_delta"], market_tickers=["X-Y-Z"])
 
         assert len(received) == 1
         assert received[0]["type"] == "orderbook_delta"
@@ -162,8 +184,7 @@ async def test_reconnects_on_connection_closed():
 
     settings = _make_settings()
 
-    # First ws: raises ConnectionClosed in __aenter__
-    # Second ws: succeeds with no messages
+    # First ws: raises ConnectionClosed during async iteration
     fail_ws = AsyncMock()
     fail_ws.send = AsyncMock()
 
@@ -173,32 +194,29 @@ async def test_reconnects_on_connection_closed():
 
     fail_ws.__aiter__ = lambda self: fail_aiter()
 
+    # Second ws: succeeds with no messages — raises _StopTest to terminate loop
     success_ws = _make_ws_mock(messages=[])
 
-    call_count = 0
+    call_count = [0]
 
-    class ContextManagerSequence:
-        def __init__(self, wses):
-            self.wses = wses
-            self.idx = 0
-
-        def __call__(self, url, **kwargs):
-            cm = MagicMock()
-            ws = self.wses[min(self.idx, len(self.wses) - 1)]
-            self.idx += 1
-            cm.__aenter__ = AsyncMock(return_value=ws)
-            cm.__aexit__ = AsyncMock(return_value=False)
-            return cm
-
-    connect_seq = ContextManagerSequence([fail_ws, success_ws])
+    def connect_side_effect(url, **kwargs):
+        call_count[0] += 1
+        cm = MagicMock()
+        if call_count[0] == 1:
+            cm.__aenter__ = AsyncMock(return_value=fail_ws)
+        else:
+            cm.__aenter__ = AsyncMock(return_value=success_ws)
+        cm.__aexit__ = AsyncMock(return_value=False)
+        return cm
 
     with patch("pmtb.kalshi.ws_client.load_private_key", return_value=MagicMock()), \
          patch("pmtb.kalshi.ws_client.build_kalshi_headers", return_value={}), \
-         patch("pmtb.kalshi.ws_client.websockets.connect", side_effect=connect_seq), \
+         patch("pmtb.kalshi.ws_client.websockets.connect", side_effect=connect_side_effect), \
          patch("pmtb.kalshi.ws_client.asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
 
         client = KalshiWSClient(settings)
-        await client.run(AsyncMock(), channels=["orderbook_delta"], market_tickers=["T"])
+        with pytest.raises(_StopTest):
+            await client.run(AsyncMock(), channels=["orderbook_delta"], market_tickers=["T"])
 
         # sleep(5) must have been called exactly once after the first failure
         mock_sleep.assert_called_once_with(5)
@@ -234,7 +252,8 @@ async def test_reconnects_on_oserror():
          patch("pmtb.kalshi.ws_client.asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
 
         client = KalshiWSClient(settings)
-        await client.run(AsyncMock(), channels=["orderbook_delta"], market_tickers=["T"])
+        with pytest.raises(_StopTest):
+            await client.run(AsyncMock(), channels=["orderbook_delta"], market_tickers=["T"])
 
         mock_sleep.assert_called_once_with(5)
 
@@ -259,7 +278,8 @@ async def test_subscription_includes_market_tickers():
         mock_connect.return_value.__aexit__ = AsyncMock(return_value=False)
 
         client = KalshiWSClient(settings)
-        await client.run(AsyncMock(), channels=["fill"], market_tickers=["TICKER-A", "TICKER-B"])
+        with pytest.raises(_StopTest):
+            await client.run(AsyncMock(), channels=["fill"], market_tickers=["TICKER-A", "TICKER-B"])
 
         sent_payload = json.loads(ws_mock.send.call_args[0][0])
         assert "TICKER-A" in sent_payload["params"]["market_tickers"]
@@ -286,7 +306,8 @@ async def test_ws_url_paper_mode():
         mock_connect.return_value.__aexit__ = AsyncMock(return_value=False)
 
         client = KalshiWSClient(settings)
-        await client.run(AsyncMock(), channels=["orderbook_delta"], market_tickers=["T"])
+        with pytest.raises(_StopTest):
+            await client.run(AsyncMock(), channels=["orderbook_delta"], market_tickers=["T"])
 
         url_used = mock_connect.call_args[0][0]
         assert "demo" in url_used
@@ -308,7 +329,8 @@ async def test_ws_url_live_mode():
         mock_connect.return_value.__aexit__ = AsyncMock(return_value=False)
 
         client = KalshiWSClient(settings)
-        await client.run(AsyncMock(), channels=["orderbook_delta"], market_tickers=["T"])
+        with pytest.raises(_StopTest):
+            await client.run(AsyncMock(), channels=["orderbook_delta"], market_tickers=["T"])
 
         url_used = mock_connect.call_args[0][0]
         assert "demo" not in url_used
