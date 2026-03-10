@@ -52,16 +52,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Edge Detection
 
-- [ ] **EDGE-01**: System computes market-implied probability (p_market) from current Kalshi bid/ask prices
-- [ ] **EDGE-02**: System computes expected value: EV = p_model * b - (1 - p_model)
-- [ ] **EDGE-03**: System computes edge: edge = p_model - p_market
-- [ ] **EDGE-04**: System only passes trades to sizing when edge > 0.04 (4% minimum)
+- [x] **EDGE-01**: System computes market-implied probability (p_market) from current Kalshi bid/ask prices
+- [x] **EDGE-02**: System computes expected value: EV = p_model * b - (1 - p_model)
+- [x] **EDGE-03**: System computes edge: edge = p_model - p_market
+- [x] **EDGE-04**: System only passes trades to sizing when edge > 0.04 (4% minimum)
 
 ### Position Sizing
 
-- [ ] **SIZE-01**: System computes Kelly optimal fraction: f* = (p*b - q) / b
-- [ ] **SIZE-02**: System applies fractional Kelly: f = alpha * f* with configurable alpha (0.25–0.5)
-- [ ] **SIZE-03**: Position size is capped by risk management limits before order placement
+- [x] **SIZE-01**: System computes Kelly optimal fraction: f* = (p*b - q) / b
+- [x] **SIZE-02**: System applies fractional Kelly: f = alpha * f* with configurable alpha (0.25–0.5)
+- [x] **SIZE-03**: Position size is capped by risk management limits before order placement
 
 ### Risk Management
 
@@ -165,13 +165,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRED-05 | Phase 4 | Complete |
 | PRED-06 | Phase 4 | Complete |
 | PRED-07 | Phase 4 | Complete |
-| EDGE-01 | Phase 5 | Pending |
-| EDGE-02 | Phase 5 | Pending |
-| EDGE-03 | Phase 5 | Pending |
-| EDGE-04 | Phase 5 | Pending |
-| SIZE-01 | Phase 5 | Pending |
-| SIZE-02 | Phase 5 | Pending |
-| SIZE-03 | Phase 5 | Pending |
+| EDGE-01 | Phase 5 | Complete |
+| EDGE-02 | Phase 5 | Complete |
+| EDGE-03 | Phase 5 | Complete |
+| EDGE-04 | Phase 5 | Complete |
+| SIZE-01 | Phase 5 | Complete |
+| SIZE-02 | Phase 5 | Complete |
+| SIZE-03 | Phase 5 | Complete |
 | RISK-01 | Phase 5 | Pending |
 | RISK-02 | Phase 5 | Pending |
 | RISK-03 | Phase 5 | Pending |
