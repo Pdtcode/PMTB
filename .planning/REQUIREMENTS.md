@@ -20,7 +20,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Market Scanning
 
-- [ ] **SCAN-01**: Scanner retrieves all active Kalshi markets across all categories
+- [x] **SCAN-01**: Scanner retrieves all active Kalshi markets across all categories
 - [x] **SCAN-02**: Scanner filters markets by minimum liquidity threshold
 - [x] **SCAN-03**: Scanner filters markets by minimum 24h volume threshold
 - [x] **SCAN-04**: Scanner filters markets by time-to-resolution window (not too close, not too far)
@@ -142,7 +142,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFR-06 | Phase 1 | Complete |
 | INFR-07 | Phase 1 | Complete |
 | INFR-08 | Phase 1 | Complete |
-| SCAN-01 | Phase 2 | Pending |
+| SCAN-01 | Phase 2 | Complete |
 | SCAN-02 | Phase 2 | Complete |
 | SCAN-03 | Phase 2 | Complete |
 | SCAN-04 | Phase 2 | Complete |

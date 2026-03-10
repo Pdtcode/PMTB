@@ -13,7 +13,7 @@ PMTB is built as a linear multi-agent async pipeline: scan Kalshi markets, gathe
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure Foundation** - Kalshi API client, PostgreSQL schema, async DB layer, configuration, paper trading mode, and structured logging (completed 2026-03-10)
-- [ ] **Phase 2: Market Scanner** - Scan all Kalshi markets and filter candidates by liquidity, volume, spread, time-to-resolution, and volatility
+- [x] **Phase 2: Market Scanner** - Scan all Kalshi markets and filter candidates by liquidity, volume, spread, time-to-resolution, and volatility (completed 2026-03-10)
 - [ ] **Phase 3: Research Signal Pipeline** - Parallel async research agents (Twitter/X, Reddit, RSS, Google Trends) with NLP classification and signal persistence
 - [ ] **Phase 4: Probability Model** - XGBoost classifier with calibration, gated Claude LLM reasoning, and Bayesian updating into final p_model
 - [ ] **Phase 5: Decision Layer** - Edge detection, fractional Kelly sizing, and multi-layer risk management with independent circuit breaker
@@ -48,7 +48,7 @@ Plans:
   2. Markets below liquidity, volume, or spread thresholds are filtered out and the filtered count is logged; threshold values are configurable without code changes
   3. Markets too close or too far from resolution are excluded by the time-to-resolution filter
   4. The scanner outputs a typed list of MarketCandidate objects that downstream pipeline stages consume without additional parsing or validation
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 02-01-PLAN.md — Scanner type contracts (MarketCandidate, ScanResult), filter functions, and config fields
 - [ ] 02-02-PLAN.md — MarketScanner class with pagination, DB upsert, filter chain, enrichment, and scan loop
@@ -118,7 +118,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 4/4 | Complete   | 2026-03-10 |
-| 2. Market Scanner | 0/2 | Not started | - |
+| 2. Market Scanner | 2/2 | Complete   | 2026-03-10 |
 | 3. Research Signal Pipeline | 0/TBD | Not started | - |
 | 4. Probability Model | 0/TBD | Not started | - |
 | 5. Decision Layer | 0/TBD | Not started | - |
