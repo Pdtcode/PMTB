@@ -30,10 +30,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Research Signal Pipeline
 
-- [ ] **RSRCH-01**: Research agents gather sentiment signals from Twitter/X API for each candidate market
-- [ ] **RSRCH-02**: Research agents gather sentiment signals from Reddit API for each candidate market
-- [ ] **RSRCH-03**: Research agents gather relevant articles from RSS news feeds for each candidate market
-- [ ] **RSRCH-04**: Research agents gather search interest data from Google Trends for each candidate market
+- [x] **RSRCH-01**: Research agents gather sentiment signals from Twitter/X API for each candidate market
+- [x] **RSRCH-02**: Research agents gather sentiment signals from Reddit API for each candidate market
+- [x] **RSRCH-03**: Research agents gather relevant articles from RSS news feeds for each candidate market
+- [x] **RSRCH-04**: Research agents gather search interest data from Google Trends for each candidate market
 - [ ] **RSRCH-05**: All four research sources run in parallel using asyncio
 - [x] **RSRCH-06**: NLP sentiment analysis classifies each signal as bullish/bearish/neutral with confidence score
 - [x] **RSRCH-07**: Topic classification maps signals to relevant market categories
@@ -149,10 +149,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCAN-05 | Phase 2 | Complete |
 | SCAN-06 | Phase 2 | Complete |
 | SCAN-07 | Phase 2 | Complete |
-| RSRCH-01 | Phase 3 | Pending |
-| RSRCH-02 | Phase 3 | Pending |
-| RSRCH-03 | Phase 3 | Pending |
-| RSRCH-04 | Phase 3 | Pending |
+| RSRCH-01 | Phase 3 | Complete |
+| RSRCH-02 | Phase 3 | Complete |
+| RSRCH-03 | Phase 3 | Complete |
+| RSRCH-04 | Phase 3 | Complete |
 | RSRCH-05 | Phase 3 | Pending |
 | RSRCH-06 | Phase 3 | Complete |
 | RSRCH-07 | Phase 3 | Complete |
