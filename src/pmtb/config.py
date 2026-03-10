@@ -113,6 +113,48 @@ class Settings(BaseSettings):
         description="Max concurrent API calls during market enrichment",
     )
 
+    # --- Research settings ---
+    research_agent_timeout: float = Field(
+        default=30.0,
+        description="Timeout in seconds per research agent",
+    )
+    research_concurrency: int = Field(
+        default=4,
+        description="Max concurrent research agent calls per market",
+    )
+    vader_escalation_threshold: float = Field(
+        default=0.3,
+        description="VADER compound score abs threshold below which text is escalated to Claude",
+    )
+    query_cache_ttl_seconds: int = Field(
+        default=3600,
+        description="TTL for cached search queries per ticker",
+    )
+    research_results_per_source: int = Field(
+        default=10,
+        description="Number of results to fetch per source per market",
+    )
+    reddit_client_id: str | None = Field(
+        default=None,
+        description="Reddit API OAuth client ID",
+    )
+    reddit_client_secret: str | None = Field(
+        default=None,
+        description="Reddit API OAuth client secret",
+    )
+    reddit_user_agent: str = Field(
+        default="pmtb-research/1.0",
+        description="Reddit API user agent string",
+    )
+    anthropic_api_key: str | None = Field(
+        default=None,
+        description="Anthropic API key for Claude sentiment escalation — None = VADER-only mode",
+    )
+    rss_feeds: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="RSS feed URLs by market category",
+    )
+
     # --- Logging ---
     log_level: str = Field(
         default="INFO",

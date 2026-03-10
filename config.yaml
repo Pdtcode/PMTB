@@ -9,3 +9,32 @@ max_drawdown: 0.08
 # Scanner settings
 scan_interval_seconds: 300
 rate_limit_per_second: 10
+
+# Research agent settings
+research_agent_timeout: 30
+vader_escalation_threshold: 0.3
+query_cache_ttl_seconds: 3600
+research_results_per_source: 10
+
+# RSS feed URLs by market category
+# Add or override these in your local config.yaml without changing code
+rss_feeds:
+  politics:
+    - "https://feeds.ap.org/rss/politics"
+    - "https://feeds.reuters.com/reuters/politicsNews"
+  economics:
+    - "https://feeds.reuters.com/reuters/businessNews"
+    - "https://feeds.bloomberg.com/markets/news.rss"
+  finance:
+    - "https://finance.yahoo.com/news/rssindex"
+    - "https://feeds.marketwatch.com/marketwatch/topstories/"
+  sports:
+    - "https://www.espn.com/espn/rss/news"
+  weather:
+    - "https://www.weather.gov/rss_page.php"
+  science:
+    - "https://www.nature.com/nature.rss"
+    - "https://www.sciencedaily.com/rss/all.xml"
+  general:
+    - "https://feeds.ap.org/rss/apf-topnews"
+    - "https://feeds.reuters.com/reuters/topNews"
