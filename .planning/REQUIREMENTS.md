@@ -45,10 +45,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PRED-01**: XGBoost binary classifier generates base probability estimates from market features and research signals
 - [x] **PRED-02**: XGBoost probabilities are calibrated using Platt scaling or isotonic regression (not raw predict_proba)
 - [x] **PRED-03**: Claude API provides structured probability reasoning for markets routed through LLM analysis
-- [ ] **PRED-04**: LLM analysis is gated — only markets with sufficient edge potential or low XGBoost confidence get Claude calls
+- [x] **PRED-04**: LLM analysis is gated — only markets with sufficient edge potential or low XGBoost confidence get Claude calls
 - [x] **PRED-05**: Bayesian updating layer incorporates prior probability and new signal evidence to produce final p_model
 - [x] **PRED-06**: Model outputs typed prediction objects with p_model, confidence interval, and contributing signal weights
-- [ ] **PRED-07**: All model predictions are persisted to PostgreSQL for performance tracking
+- [x] **PRED-07**: All model predictions are persisted to PostgreSQL for performance tracking
 
 ### Edge Detection
 
@@ -161,10 +161,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRED-01 | Phase 4 | Complete |
 | PRED-02 | Phase 4 | Complete |
 | PRED-03 | Phase 4 | Complete |
-| PRED-04 | Phase 4 | Pending |
+| PRED-04 | Phase 4 | Complete |
 | PRED-05 | Phase 4 | Complete |
 | PRED-06 | Phase 4 | Complete |
-| PRED-07 | Phase 4 | Pending |
+| PRED-07 | Phase 4 | Complete |
 | EDGE-01 | Phase 5 | Pending |
 | EDGE-02 | Phase 5 | Pending |
 | EDGE-03 | Phase 5 | Pending |

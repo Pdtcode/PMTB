@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Infrastructure Foundation** - Kalshi API client, PostgreSQL schema, async DB layer, configuration, paper trading mode, and structured logging (completed 2026-03-10)
 - [x] **Phase 2: Market Scanner** - Scan all Kalshi markets and filter candidates by liquidity, volume, spread, time-to-resolution, and volatility (completed 2026-03-10)
 - [x] **Phase 3: Research Signal Pipeline** - Parallel async research agents (Twitter/X, Reddit, RSS, Google Trends) with NLP classification and signal persistence (completed 2026-03-10)
-- [ ] **Phase 4: Probability Model** - XGBoost classifier with calibration, gated Claude LLM reasoning, and Bayesian updating into final p_model
+- [x] **Phase 4: Probability Model** - XGBoost classifier with calibration, gated Claude LLM reasoning, and Bayesian updating into final p_model (completed 2026-03-10)
 - [ ] **Phase 5: Decision Layer** - Edge detection, fractional Kelly sizing, and multi-layer risk management with independent circuit breaker
 - [ ] **Phase 6: Execution, Integration, and Deployment** - Order placement, fill tracking, end-to-end pipeline wiring, paper trading validation, and Docker deployment
 - [ ] **Phase 7: Performance Tracking and Learning Loop** - Brier score, Sharpe, losing trade analysis, automated XGBoost retraining, and backtesting engine
@@ -78,7 +78,7 @@ Plans:
   2. Claude API is only called for markets where XGBoost confidence falls in the 0.4–0.6 band; a run over 100 candidate markets shows a Claude call rate well below 100%
   3. The model outputs a typed PredictionResult with p_model, confidence interval, and contributing signal weights for every candidate market
   4. All predictions are persisted to PostgreSQL with the model version and timestamp, visible after a pipeline run
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 04-01-PLAN.md — Prediction types (PredictionResult), feature builder, XGBoost classifier with calibration and persistence
 - [ ] 04-02-PLAN.md — Claude LLM predictor, probability combiner (log-odds/weighted avg), confidence interval computation
@@ -129,7 +129,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Infrastructure Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Market Scanner | 2/2 | Complete   | 2026-03-10 |
 | 3. Research Signal Pipeline | 4/4 | Complete   | 2026-03-10 |
-| 4. Probability Model | 2/3 | In Progress|  |
+| 4. Probability Model | 3/3 | Complete   | 2026-03-10 |
 | 5. Decision Layer | 0/TBD | Not started | - |
 | 6. Execution, Integration, and Deployment | 0/TBD | Not started | - |
 | 7. Performance Tracking and Learning Loop | 0/TBD | Not started | - |
