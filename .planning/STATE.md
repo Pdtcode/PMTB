@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-03-10T07:30:55.315Z"
+stopped_at: Completed 02-01-PLAN.md (scanner models and filter functions)
+last_updated: "2026-03-10T07:49:38.808Z"
 last_activity: 2026-03-10 — Executed Plan 01-01 (project scaffolding, DB layer, logging, metrics)
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 6
+  completed_plans: 5
   percent: 5
 ---
 
@@ -53,6 +53,7 @@ Progress: [█░░░░░░░░░] 5%
 | Phase 01-infrastructure-foundation P03 | 3 | 1 tasks | 3 files |
 | Phase 01-infrastructure-foundation P02 | 8 | 2 tasks | 9 files |
 | Phase 01-infrastructure-foundation P04 | 12 | 2 tasks | 5 files |
+| Phase 02-market-scanner P01 | 2 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - [Phase 01-02]: PSS salt_length=DIGEST_LENGTH for SHA-256 RSA-PSS signing per Kalshi spec
 - [Phase 01-04]: _StopTest sentinel exception used to terminate infinite while-True loop in WS reconnect tests
 - [Phase 01-04]: Reconciliation errors non-fatal in main.py — startup continues with warning if Kalshi API unavailable
+- [Phase 02-01]: open_interest_fp used for liquidity proxy — liquidity_dollars is deprecated/always 0
+- [Phase 02-01]: Warmup markets pass volatility filter (benefit of the doubt) — safer than false rejection
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T07:30:55.313Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-market-scanner/02-CONTEXT.md
+Last session: 2026-03-10T07:49:38.805Z
+Stopped at: Completed 02-01-PLAN.md (scanner models and filter functions)
+Resume file: None

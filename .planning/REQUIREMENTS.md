@@ -21,12 +21,12 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Market Scanning
 
 - [ ] **SCAN-01**: Scanner retrieves all active Kalshi markets across all categories
-- [ ] **SCAN-02**: Scanner filters markets by minimum liquidity threshold
-- [ ] **SCAN-03**: Scanner filters markets by minimum 24h volume threshold
-- [ ] **SCAN-04**: Scanner filters markets by time-to-resolution window (not too close, not too far)
-- [ ] **SCAN-05**: Scanner filters markets by maximum bid-ask spread
-- [ ] **SCAN-06**: Scanner filters markets by volatility criteria
-- [ ] **SCAN-07**: Scanner outputs typed candidate market objects consumed by downstream pipeline stages
+- [x] **SCAN-02**: Scanner filters markets by minimum liquidity threshold
+- [x] **SCAN-03**: Scanner filters markets by minimum 24h volume threshold
+- [x] **SCAN-04**: Scanner filters markets by time-to-resolution window (not too close, not too far)
+- [x] **SCAN-05**: Scanner filters markets by maximum bid-ask spread
+- [x] **SCAN-06**: Scanner filters markets by volatility criteria
+- [x] **SCAN-07**: Scanner outputs typed candidate market objects consumed by downstream pipeline stages
 
 ### Research Signal Pipeline
 
@@ -143,12 +143,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFR-07 | Phase 1 | Complete |
 | INFR-08 | Phase 1 | Complete |
 | SCAN-01 | Phase 2 | Pending |
-| SCAN-02 | Phase 2 | Pending |
-| SCAN-03 | Phase 2 | Pending |
-| SCAN-04 | Phase 2 | Pending |
-| SCAN-05 | Phase 2 | Pending |
-| SCAN-06 | Phase 2 | Pending |
-| SCAN-07 | Phase 2 | Pending |
+| SCAN-02 | Phase 2 | Complete |
+| SCAN-03 | Phase 2 | Complete |
+| SCAN-04 | Phase 2 | Complete |
+| SCAN-05 | Phase 2 | Complete |
+| SCAN-06 | Phase 2 | Complete |
+| SCAN-07 | Phase 2 | Complete |
 | RSRCH-01 | Phase 3 | Pending |
 | RSRCH-02 | Phase 3 | Pending |
 | RSRCH-03 | Phase 3 | Pending |
