@@ -35,7 +35,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **RSRCH-03**: Research agents gather relevant articles from RSS news feeds for each candidate market
 - [ ] **RSRCH-04**: Research agents gather search interest data from Google Trends for each candidate market
 - [ ] **RSRCH-05**: All four research sources run in parallel using asyncio
-- [ ] **RSRCH-06**: NLP sentiment analysis classifies each signal as bullish/bearish/neutral with confidence score
+- [x] **RSRCH-06**: NLP sentiment analysis classifies each signal as bullish/bearish/neutral with confidence score
 - [x] **RSRCH-07**: Topic classification maps signals to relevant market categories
 - [ ] **RSRCH-08**: Research pipeline continues with available signals if one source times out or fails
 - [ ] **RSRCH-09**: Research signals are persisted to PostgreSQL with timestamps for later analysis
@@ -154,7 +154,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RSRCH-03 | Phase 3 | Pending |
 | RSRCH-04 | Phase 3 | Pending |
 | RSRCH-05 | Phase 3 | Pending |
-| RSRCH-06 | Phase 3 | Pending |
+| RSRCH-06 | Phase 3 | Complete |
 | RSRCH-07 | Phase 3 | Complete |
 | RSRCH-08 | Phase 3 | Pending |
 | RSRCH-09 | Phase 3 | Pending |

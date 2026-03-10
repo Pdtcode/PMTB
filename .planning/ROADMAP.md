@@ -62,7 +62,7 @@ Plans:
   2. Each signal is classified as bullish, bearish, or neutral with a confidence score; the classification is stored in the database with a timestamp
   3. When one research source returns an error or times out, the pipeline proceeds with the remaining sources and logs the failure — it does not halt
   4. Research signals are visible in PostgreSQL after a scan cycle, queryable by market ticker and timestamp
-**Plans:** 4 plans
+**Plans:** 2/4 plans executed
 Plans:
 - [ ] 03-01-PLAN.md — Type contracts (ResearchAgent Protocol, SignalBundle, models) and research config fields
 - [ ] 03-02-PLAN.md — Sentiment classifier (VADER + Claude hybrid) and query constructor with TTL cache
@@ -124,7 +124,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Market Scanner | 2/2 | Complete   | 2026-03-10 |
-| 3. Research Signal Pipeline | 0/4 | Not started | - |
+| 3. Research Signal Pipeline | 2/4 | In Progress|  |
 | 4. Probability Model | 0/TBD | Not started | - |
 | 5. Decision Layer | 0/TBD | Not started | - |
 | 6. Execution, Integration, and Deployment | 0/TBD | Not started | - |
