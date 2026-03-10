@@ -24,8 +24,13 @@ def make_market() -> MarketCandidate:
         ticker="KXBTC-23DEC",
         title="Will BTC close above $40k on Dec 23?",
         category="crypto",
+        event_context={"event_id": "KXBTC"},
         close_time=datetime(2023, 12, 23, 16, 0, 0, tzinfo=timezone.utc),
+        yes_bid=0.60,
+        yes_ask=0.64,
         implied_probability=0.62,
+        spread=0.04,
+        volume_24h=5000.0,
     )
 
 
