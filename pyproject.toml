@@ -19,6 +19,11 @@ dependencies = [
     "httpx>=0.28.1",
     "vadersentiment>=3.3.2",
     "anthropic>=0.84.0",
+    "asyncpraw>=7.8.1",
+    "feedparser>=6.0.12",
+    "pytrends>=4.9.2",
+    "xgboost>=3.2.0",
+    "scikit-learn>=1.8.0",
 ]
 
 [project.optional-dependencies]

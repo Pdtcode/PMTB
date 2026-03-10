@@ -155,6 +155,50 @@ class Settings(BaseSettings):
         description="RSS feed URLs by market category",
     )
 
+    # --- Prediction model settings ---
+    prediction_min_training_samples: int = Field(
+        default=100,
+        description="Minimum labeled samples required before XGBoost trains",
+    )
+    prediction_model_path: str = Field(
+        default="models/xgb_calibrated.joblib",
+        description="Path to save/load the calibrated XGBoost model",
+    )
+    prediction_xgb_confidence_low: float = Field(
+        default=0.4,
+        description="Lower bound of XGBoost uncertainty band — triggers Claude escalation",
+    )
+    prediction_xgb_confidence_high: float = Field(
+        default=0.6,
+        description="Upper bound of XGBoost uncertainty band — triggers Claude escalation",
+    )
+    prediction_claude_model: str = Field(
+        default="claude-sonnet-4-20250514",
+        description="Claude model to use for probability escalation",
+    )
+    prediction_calibration_method: str = Field(
+        default="sigmoid",
+        pattern=r"^(sigmoid|isotonic)$",
+        description="CalibratedClassifierCV calibration method",
+    )
+    prediction_combine_method: str = Field(
+        default="log_odds",
+        pattern=r"^(log_odds|weighted_average)$",
+        description="Method for combining XGBoost and Claude probabilities",
+    )
+    prediction_ci_half_width: float = Field(
+        default=0.1,
+        description="Half-width of the confidence interval around p_model",
+    )
+    prediction_xgb_weight: float = Field(
+        default=0.6,
+        description="Weight for XGBoost probability in weighted combination",
+    )
+    prediction_claude_weight: float = Field(
+        default=0.4,
+        description="Weight for Claude probability in weighted combination",
+    )
+
     # --- Logging ---
     log_level: str = Field(
         default="INFO",
