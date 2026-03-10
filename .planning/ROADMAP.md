@@ -32,7 +32,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Alembic migrations run cleanly from scratch and produce the full database schema with all tables for trades, signals, model outputs, and metrics
   4. Configuration values (edge threshold, Kelly alpha, max drawdown) are loaded from environment variables and YAML; changing a value in config takes effect without code changes
   5. Paper trading mode can be toggled via config and routes all order calls to a no-op handler instead of the live Kalshi API
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffolding, config, DB layer, logging, metrics
+- [ ] 01-02-PLAN.md — Kalshi REST client with RSA-PSS auth and retry
+- [ ] 01-03-PLAN.md — Paper trading mode with executor protocol
+- [ ] 01-04-PLAN.md — WebSocket client and position reconciliation
 
 ### Phase 2: Market Scanner
 **Goal**: The pipeline has a filtered list of tradeable Kalshi market candidates ready for downstream research — only markets that meet all quality thresholds pass through
@@ -105,11 +110,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure Foundation | 0/TBD | Not started | - |
+| 1. Infrastructure Foundation | 0/4 | Planning complete | - |
 | 2. Market Scanner | 0/TBD | Not started | - |
 | 3. Research Signal Pipeline | 0/TBD | Not started | - |
 | 4. Probability Model | 0/TBD | Not started | - |
