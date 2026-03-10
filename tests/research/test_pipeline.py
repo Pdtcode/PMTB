@@ -36,16 +36,19 @@ from pmtb.research.models import (
 
 def make_candidate(ticker: str = "TEST-1", title: str = "Will X happen?", category: str = "politics"):
     """Create a minimal MarketCandidate-like object."""
+    import datetime as dt
     from pmtb.scanner.models import MarketCandidate
     return MarketCandidate(
         ticker=ticker,
         title=title,
         category=category,
-        yes_price=Decimal("0.5"),
-        no_price=Decimal("0.5"),
-        open_interest_fp=100,
-        close_time=__import__("datetime").datetime(2026, 12, 31, tzinfo=__import__("datetime").timezone.utc),
-        liquidity_score=10.0,
+        event_context={},
+        close_time=dt.datetime(2026, 12, 31, tzinfo=dt.timezone.utc),
+        yes_bid=0.48,
+        yes_ask=0.52,
+        implied_probability=0.50,
+        spread=0.04,
+        volume_24h=1000.0,
         volatility_score=0.1,
     )
 
