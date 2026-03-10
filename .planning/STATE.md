@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-infrastructure-foundation/01-03-PLAN.md
-last_updated: "2026-03-10T04:49:55.606Z"
+stopped_at: Completed 01-infrastructure-foundation/01-02-PLAN.md
+last_updated: "2026-03-10T04:54:20.133Z"
 last_activity: 2026-03-10 — Executed Plan 01-01 (project scaffolding, DB layer, logging, metrics)
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
   percent: 5
 ---
 
@@ -51,6 +51,7 @@ Progress: [█░░░░░░░░░] 5%
 
 *Updated after each plan completion*
 | Phase 01-infrastructure-foundation P03 | 3 | 1 tasks | 3 files |
+| Phase 01-infrastructure-foundation P02 | 8 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - [01-01]: Alembic autogenerate requires live DB — initial migration written manually from model definitions
 - [01-01]: Python 3.13.12 confirmed working with kalshi-python-async 3.8.0 (resolves Research flag)
 - [Phase 01-03]: runtime_checkable Protocol over ABC for executor interface — allows isinstance() checks without inheritance
+- [Phase 01-02]: kalshi-python-async SDK not used — urllib3 import failure; httpx.AsyncClient used as planned fallback
+- [Phase 01-02]: PSS salt_length=DIGEST_LENGTH for SHA-256 RSA-PSS signing per Kalshi spec
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T04:49:55.604Z
-Stopped at: Completed 01-infrastructure-foundation/01-03-PLAN.md
+Last session: 2026-03-10T04:54:20.131Z
+Stopped at: Completed 01-infrastructure-foundation/01-02-PLAN.md
 Resume file: None
