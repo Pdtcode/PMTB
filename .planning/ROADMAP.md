@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure Foundation** - Kalshi API client, PostgreSQL schema, async DB layer, configuration, paper trading mode, and structured logging (completed 2026-03-10)
 - [x] **Phase 2: Market Scanner** - Scan all Kalshi markets and filter candidates by liquidity, volume, spread, time-to-resolution, and volatility (completed 2026-03-10)
-- [ ] **Phase 3: Research Signal Pipeline** - Parallel async research agents (Twitter/X, Reddit, RSS, Google Trends) with NLP classification and signal persistence
+- [x] **Phase 3: Research Signal Pipeline** - Parallel async research agents (Twitter/X, Reddit, RSS, Google Trends) with NLP classification and signal persistence (completed 2026-03-10)
 - [ ] **Phase 4: Probability Model** - XGBoost classifier with calibration, gated Claude LLM reasoning, and Bayesian updating into final p_model
 - [ ] **Phase 5: Decision Layer** - Edge detection, fractional Kelly sizing, and multi-layer risk management with independent circuit breaker
 - [ ] **Phase 6: Execution, Integration, and Deployment** - Order placement, fill tracking, end-to-end pipeline wiring, paper trading validation, and Docker deployment
@@ -62,7 +62,7 @@ Plans:
   2. Each signal is classified as bullish, bearish, or neutral with a confidence score; the classification is stored in the database with a timestamp
   3. When one research source returns an error or times out, the pipeline proceeds with the remaining sources and logs the failure — it does not halt
   4. Research signals are visible in PostgreSQL after a scan cycle, queryable by market ticker and timestamp
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [ ] 03-01-PLAN.md — Type contracts (ResearchAgent Protocol, SignalBundle, models) and research config fields
 - [ ] 03-02-PLAN.md — Sentiment classifier (VADER + Claude hybrid) and query constructor with TTL cache
@@ -124,7 +124,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Market Scanner | 2/2 | Complete   | 2026-03-10 |
-| 3. Research Signal Pipeline | 3/4 | In Progress|  |
+| 3. Research Signal Pipeline | 4/4 | Complete   | 2026-03-10 |
 | 4. Probability Model | 0/TBD | Not started | - |
 | 5. Decision Layer | 0/TBD | Not started | - |
 | 6. Execution, Integration, and Deployment | 0/TBD | Not started | - |
