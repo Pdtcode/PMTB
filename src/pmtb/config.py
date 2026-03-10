@@ -1,0 +1,124 @@
+"""
+Configuration management for PMTB.
+
+Settings class uses pydantic-settings v2 with layered sources:
+    defaults -> YAML file -> .env file -> environment variables
+
+Validated at startup — fails fast with clear errors on missing required fields.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Tuple, Type
+
+from pydantic import Field
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+    YamlConfigSettingsSource,
+)
+
+
+class Settings(BaseSettings):
+    """
+    Application settings loaded from .env + config.yaml + environment variables.
+
+    Precedence (highest to lowest):
+        1. Environment variables
+        2. YAML config file (config.yaml)
+        3. .env file
+        4. Defaults defined here
+    """
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        yaml_file="config.yaml",
+    )
+
+    # --- Trading mode ---
+    trading_mode: str = Field(
+        default="paper",
+        pattern=r"^(paper|live)$",
+        description="Trading mode: 'paper' (simulated) or 'live' (real orders)",
+    )
+
+    # --- Required secrets (no defaults — must be set) ---
+    database_url: str = Field(
+        description="PostgreSQL connection URL (postgresql+asyncpg://...)"
+    )
+    kalshi_api_key_id: str = Field(
+        description="Kalshi API key ID for request signing"
+    )
+    kalshi_private_key_path: str = Field(
+        description="Path to RSA private key PEM file for Kalshi request signing"
+    )
+
+    # --- Trading model parameters (YAML defaults) ---
+    edge_threshold: float = Field(
+        default=0.04,
+        description="Minimum edge (model probability - market probability) to consider a trade",
+    )
+    kelly_alpha: float = Field(
+        default=0.25,
+        description="Fractional Kelly multiplier (0.25 = quarter Kelly)",
+    )
+    max_drawdown: float = Field(
+        default=0.08,
+        description="Maximum portfolio drawdown before halting (hard stop)",
+    )
+
+    # --- Scanner settings ---
+    scan_interval_seconds: int = Field(
+        default=300,
+        description="Seconds between market scan cycles",
+    )
+    rate_limit_per_second: int = Field(
+        default=10,
+        description="API calls per second limit",
+    )
+
+    # --- Logging ---
+    log_level: str = Field(
+        default="INFO",
+        description="Logging level: DEBUG, INFO, WARNING, ERROR",
+    )
+
+    # --- Kalshi API endpoints ---
+    kalshi_base_url: str = Field(
+        default="https://api.elections.kalshi.com",
+        description="Kalshi production REST API base URL",
+    )
+    kalshi_ws_url: str = Field(
+        default="wss://api.elections.kalshi.com/trade-api/ws/v2",
+        description="Kalshi production WebSocket URL",
+    )
+    kalshi_demo_base_url: str = Field(
+        default="https://demo-api.kalshi.co",
+        description="Kalshi demo REST API base URL",
+    )
+    kalshi_demo_ws_url: str = Field(
+        default="wss://demo-api.kalshi.co/trade-api/ws/v2",
+        description="Kalshi demo WebSocket URL",
+    )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        """
+        Custom source order: env vars > YAML > .env > init defaults.
+        This ensures environment variables always win (important for Docker/CI).
+        """
+        return (
+            env_settings,
+            YamlConfigSettingsSource(settings_cls),
+            dotenv_settings,
+            init_settings,
+        )

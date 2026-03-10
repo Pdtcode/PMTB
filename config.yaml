@@ -1,0 +1,11 @@
+# PMTB non-secret configuration defaults
+# Secrets (API keys, database URLs) go in .env file
+
+# Trading model parameters
+edge_threshold: 0.04
+kelly_alpha: 0.25
+max_drawdown: 0.08
+
+# Scanner settings
+scan_interval_seconds: 300
+rate_limit_per_second: 10
