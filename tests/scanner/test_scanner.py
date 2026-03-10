@@ -378,45 +378,43 @@ class TestRunForever:
 
         factory, _ = mock_session
 
-        call_count = 0
+        cycle_count = 0
+        sleep_seconds = []
 
         async def mock_run_cycle():
-            nonlocal call_count
-            call_count += 1
-            if call_count >= 1:
-                raise _StopTest("one cycle done")
-            return MagicMock(spec=ScanResult)
+            nonlocal cycle_count
+            cycle_count += 1
+            # Return a fake result
+            return MagicMock(spec=ScanResult, candidates=[])
 
-        class _StopTest(Exception):
+        class _StopAfterFirstSleep(Exception):
             pass
 
-        sleep_calls = []
-
         async def mock_sleep(seconds):
-            sleep_calls.append(seconds)
+            sleep_seconds.append(seconds)
+            # Raise after recording the sleep call so the loop terminates
+            raise _StopAfterFirstSleep("stop after first sleep")
 
         scanner = MarketScanner(mock_client, settings, session_factory=factory)
         scanner.run_cycle = mock_run_cycle
 
         async def run():
-            with patch("pmtb.scanner.scanner.asyncio") as mock_asyncio:
-                mock_asyncio.sleep = mock_sleep
-                mock_asyncio.gather = asyncio.gather
-                mock_asyncio.Semaphore = asyncio.Semaphore
+            with patch("pmtb.scanner.scanner.asyncio.sleep", mock_sleep):
                 try:
                     await scanner.run_forever()
-                except _StopTest:
+                except _StopAfterFirstSleep:
                     pass
 
         asyncio.get_event_loop().run_until_complete(run())
 
-        # sleep should NOT have been called since run_cycle raised before sleep
-        # But the real test is that run_forever is an infinite loop —
-        # let's verify it calls run_cycle at least once and would sleep
-        assert call_count >= 1
+        assert cycle_count >= 1
+        assert len(sleep_seconds) >= 1
+        assert sleep_seconds[0] == settings.scan_interval_seconds
 
     def test_run_forever_sleeps_on_success(self, mock_client, settings, mock_session):
         """run_forever calls asyncio.sleep with scan_interval_seconds after successful cycle."""
+        # This is covered by test_run_forever_sleeps_between_cycles above.
+        # Including as a separate explicit assertion for clarity.
         from pmtb.scanner.scanner import MarketScanner
 
         factory, _ = mock_session
@@ -430,7 +428,7 @@ class TestRunForever:
         async def mock_run_cycle():
             nonlocal cycle_count
             cycle_count += 1
-            return MagicMock(spec=ScanResult)
+            return MagicMock(spec=ScanResult, candidates=[])
 
         async def mock_sleep(seconds):
             sleep_seconds.append(seconds)
@@ -440,10 +438,7 @@ class TestRunForever:
         scanner.run_cycle = mock_run_cycle
 
         async def run():
-            with patch("pmtb.scanner.scanner.asyncio") as mock_asyncio:
-                mock_asyncio.sleep = mock_sleep
-                mock_asyncio.gather = asyncio.gather
-                mock_asyncio.Semaphore = asyncio.Semaphore
+            with patch("pmtb.scanner.scanner.asyncio.sleep", mock_sleep):
                 try:
                     await scanner.run_forever()
                 except _StopAfterFirst:
