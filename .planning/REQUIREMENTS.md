@@ -11,9 +11,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **INFR-01**: System connects to Kalshi REST API with token-based authentication and automatic token refresh
 - [ ] **INFR-02**: System connects to Kalshi WebSocket API for real-time orderbook and fill event feeds
-- [ ] **INFR-03**: PostgreSQL database stores all trade history, signals, model outputs, and performance metrics
-- [ ] **INFR-04**: Database schema supports migrations via Alembic
-- [ ] **INFR-05**: Configuration is managed via environment variables and YAML config files (edge threshold, Kelly alpha, max drawdown, rate limits)
+- [x] **INFR-03**: PostgreSQL database stores all trade history, signals, model outputs, and performance metrics
+- [x] **INFR-04**: Database schema supports migrations via Alembic
+- [x] **INFR-05**: Configuration is managed via environment variables and YAML config files (edge threshold, Kelly alpha, max drawdown, rate limits)
 - [ ] **INFR-06**: System implements exponential backoff on API rate limit (429) and server error (5xx) responses
 - [ ] **INFR-07**: System reconciles positions on restart to prevent orphaned orders
 - [ ] **INFR-08**: System runs in paper trading mode that simulates execution without placing real orders
@@ -136,9 +136,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | INFR-01 | Phase 1 | Pending |
 | INFR-02 | Phase 1 | Pending |
-| INFR-03 | Phase 1 | Pending |
-| INFR-04 | Phase 1 | Pending |
-| INFR-05 | Phase 1 | Pending |
+| INFR-03 | Phase 1 | Complete |
+| INFR-04 | Phase 1 | Complete |
+| INFR-05 | Phase 1 | Complete |
 | INFR-06 | Phase 1 | Pending |
 | INFR-07 | Phase 1 | Pending |
 | INFR-08 | Phase 1 | Pending |
