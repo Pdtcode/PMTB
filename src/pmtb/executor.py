@@ -91,6 +91,7 @@ class LiveOrderExecutor:
 def create_executor(
     settings: "Settings",
     kalshi_client=None,
+    session_factory=None,
 ) -> OrderExecutorProtocol:
     """
     Factory: returns the correct executor based on settings.trading_mode.
@@ -98,6 +99,9 @@ def create_executor(
     Args:
         settings: Application Settings instance.
         kalshi_client: KalshiClient instance required when trading_mode=="live".
+        session_factory: Optional async_sessionmaker for DB persistence.
+            When provided and trading_mode=="paper", PaperOrderExecutor will
+            persist orders to DB with is_paper=True.
 
     Returns:
         PaperOrderExecutor if trading_mode=="paper".
@@ -109,7 +113,7 @@ def create_executor(
     from pmtb.paper import PaperOrderExecutor
 
     if settings.trading_mode == "paper":
-        return PaperOrderExecutor()
+        return PaperOrderExecutor(session_factory=session_factory)
 
     if settings.trading_mode == "live":
         if kalshi_client is None:
