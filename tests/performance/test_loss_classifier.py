@@ -293,9 +293,10 @@ class TestMarketShockClassification:
             resolved_outcome="no",
             pnl=Decimal("-3.00"),
         )
+        # p_market=None — no market price data available (model blind to market drift)
         model_output = _make_model_output(
             p_model=Decimal("0.52"),
-            p_market=Decimal("0.50"),
+            p_market=None,
             used_llm=False,
         )
         signals = [
