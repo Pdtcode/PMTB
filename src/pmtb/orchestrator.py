@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from pmtb.decision.pipeline import DecisionPipeline
     from pmtb.fill_tracker import FillTracker
     from pmtb.order_repo import OrderRepository
+    from pmtb.performance.learning_loop import LearningLoop
     from pmtb.scanner.scanner import MarketScanner
     from pmtb.research.pipeline import ResearchPipeline
     from pmtb.prediction.pipeline import ProbabilityPipeline
@@ -62,10 +63,11 @@ class PipelineOrchestrator:
     """
     End-to-end pipeline orchestrator.
 
-    Runs three concurrent async tasks via asyncio.gather:
+    Runs concurrent async tasks via asyncio.gather:
       1. _full_cycle_loop — full pipeline every scan_interval_seconds
       2. _ws_reeval_loop  — decision re-evaluation on WS price events
       3. fill_tracker.run — fill tracking, stale cancellation, REST polling
+      4. learning_loop.run (optional) — settlement polling and XGBoost retraining
 
     Constructor:
         scanner:          MarketScanner
@@ -77,6 +79,7 @@ class PipelineOrchestrator:
         order_repo:       OrderRepository
         settings:         Settings
         session_factory:  SQLAlchemy async_sessionmaker
+        learning_loop:    Optional LearningLoop for feedback retraining (default None)
     """
 
     def __init__(
@@ -90,6 +93,7 @@ class PipelineOrchestrator:
         order_repo: "OrderRepository",
         settings: "Settings",
         session_factory,
+        learning_loop: "LearningLoop | None" = None,
     ) -> None:
         self._scanner = scanner
         self._research = research
@@ -100,6 +104,7 @@ class PipelineOrchestrator:
         self._repo = order_repo
         self._settings = settings
         self._session_factory = session_factory
+        self._learning_loop = learning_loop
 
         self._price_event_queue: asyncio.Queue = asyncio.Queue()
         self._last_predictions: list = []
@@ -111,18 +116,22 @@ class PipelineOrchestrator:
 
     async def run(self, stop_event: asyncio.Event) -> None:
         """
-        Run all three concurrent loops until stop_event is set.
+        Run all concurrent loops until stop_event is set.
 
         Loops:
             1. _full_cycle_loop  — full pipeline every scan_interval_seconds
             2. _ws_reeval_loop   — re-evaluate on WS price events
             3. fill_tracker.run  — fill lifecycle management
+            4. learning_loop.run (optional) — settlement polling + retraining
         """
-        await asyncio.gather(
+        tasks = [
             self._full_cycle_loop(stop_event),
             self._ws_reeval_loop(stop_event),
             self._fill_tracker.run(stop_event),
-        )
+        ]
+        if self._learning_loop is not None:
+            tasks.append(self._learning_loop.run(stop_event))
+        await asyncio.gather(*tasks)
 
     # ------------------------------------------------------------------
     # Public: WS price event injection

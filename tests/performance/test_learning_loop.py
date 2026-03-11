@@ -482,8 +482,11 @@ class TestMaybeRetrain:
             loop._build_training_data = AsyncMock(
                 return_value=(X_data.astype(np.float64), y_data.astype(np.float64), resolved_ats)
             )
+            # Patch _get_baseline_brier to return a low baseline so degradation check passes
+            loop._get_baseline_brier = AsyncMock(return_value=0.20)
 
-            # Trigger with brier_degradation — should attempt retrain (training data available)
+            # Trigger with brier_degradation — rolling(0.40) > baseline(0.20) + threshold(0.05)
+            # so retrain should be attempted
             result = await loop.maybe_retrain(trigger="brier_degradation")
             # Whether or not the model improved, retrain was attempted (not skipped)
             # — we verify it ran (predictor.is_ready is True)
@@ -521,7 +524,8 @@ class TestMaybeRetrain:
 
 
 class TestSchedulerIntegration:
-    def test_start_stop_lifecycle(self):
+    @pytest.mark.asyncio
+    async def test_start_stop_lifecycle(self):
         """start() begins scheduler, stop() shuts it down without error."""
         from pmtb.performance.learning_loop import LearningLoop
 
@@ -538,9 +542,12 @@ class TestSchedulerIntegration:
         assert loop._scheduler.running
 
         loop.stop()
+        # Give the async scheduler a moment to process shutdown
+        await asyncio.sleep(0.05)
         assert not loop._scheduler.running
 
-    def test_daily_recompute_scheduled(self):
+    @pytest.mark.asyncio
+    async def test_daily_recompute_scheduled(self):
         """APScheduler has a job for metrics_service.recompute_all_windows with 24h interval."""
         from pmtb.performance.learning_loop import LearningLoop
 
@@ -573,7 +580,8 @@ class TestSchedulerIntegration:
         finally:
             loop.stop()
 
-    def test_periodic_retrain_job_max_instances_one(self):
+    @pytest.mark.asyncio
+    async def test_periodic_retrain_job_max_instances_one(self):
         """Periodic retraining job has max_instances=1 to prevent overlapping runs."""
         from pmtb.performance.learning_loop import LearningLoop
 
