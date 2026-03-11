@@ -88,8 +88,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PERF-02**: System tracks Sharpe ratio of the portfolio
 - [x] **PERF-03**: System tracks win rate and profit factor
 - [x] **PERF-04**: System classifies losing trades by error type (wrong signal weighting, LLM error, edge decay, etc.)
-- [ ] **PERF-05**: Model learning loop feeds resolved outcomes back into XGBoost retraining pipeline
-- [ ] **PERF-06**: Learning loop triggers retraining when Brier score degrades beyond threshold
+- [x] **PERF-05**: Model learning loop feeds resolved outcomes back into XGBoost retraining pipeline
+- [x] **PERF-06**: Learning loop triggers retraining when Brier score degrades beyond threshold
 - [ ] **PERF-07**: Backtesting engine validates strategies against historical market data
 - [ ] **PERF-08**: Backtesting uses same model/sizer code paths as live trading (no separate implementation)
 
@@ -192,8 +192,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERF-02 | Phase 7 | Complete |
 | PERF-03 | Phase 7 | Complete |
 | PERF-04 | Phase 7 | Complete |
-| PERF-05 | Phase 7 | Pending |
-| PERF-06 | Phase 7 | Pending |
+| PERF-05 | Phase 7 | Complete |
+| PERF-06 | Phase 7 | Complete |
 | PERF-07 | Phase 7 | Pending |
 | PERF-08 | Phase 7 | Pending |
 
