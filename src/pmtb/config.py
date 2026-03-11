@@ -235,6 +235,28 @@ class Settings(BaseSettings):
         description="Weight for Claude probability in weighted combination",
     )
 
+    # --- Performance tracking settings (Phase 7) ---
+    brier_degradation_threshold: float = Field(
+        default=0.05,
+        description="Brier score degradation above baseline that triggers retraining alert",
+    )
+    retraining_schedule_hours: int = Field(
+        default=168,
+        description="Hours between scheduled full model retraining runs (default: 7 days)",
+    )
+    rolling_window_days: int = Field(
+        default=30,
+        description="Days for rolling performance metric window",
+    )
+    retraining_half_life_days: float = Field(
+        default=30.0,
+        description="Half-life in days for exponential decay weighting during retraining",
+    )
+    settlement_poll_interval_seconds: int = Field(
+        default=60,
+        description="Seconds between market settlement status polling cycles",
+    )
+
     # --- Logging ---
     log_level: str = Field(
         default="INFO",

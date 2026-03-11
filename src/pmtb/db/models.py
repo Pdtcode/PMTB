@@ -193,6 +193,9 @@ class Trade(Base):
 
     order: Mapped["Order"] = relationship("Order", back_populates="trades")
     market: Mapped["Market"] = relationship("Market", back_populates="trades")
+    loss_analyses: Mapped[list["LossAnalysis"]] = relationship(
+        "LossAnalysis", back_populates="trade"
+    )
 
 
 class Signal(Base):
@@ -306,4 +309,68 @@ class PerformanceMetric(Base):
 
     __table_args__ = (
         Index("ix_perf_metrics_name_computed", "metric_name", "computed_at"),
+    )
+
+
+class LossAnalysis(Base):
+    """
+    Classification of a losing trade into an error category.
+
+    Each row links a resolved losing trade to a diagnostic error type,
+    produced either by rule-based or LLM-assisted classification.
+    """
+
+    __tablename__ = "loss_analyses"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    trade_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("trades.id"),
+        nullable=False,
+    )
+    error_type: Mapped[str] = mapped_column(String, nullable=False)
+    reasoning: Mapped[str | None] = mapped_column(String, nullable=True)
+    classified_by: Mapped[str] = mapped_column(String, nullable=False)  # "rules" or "claude"
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
+
+    __table_args__ = (
+        Index("ix_loss_analyses_trade_id", "trade_id"),
+    )
+
+    trade: Mapped["Trade"] = relationship("Trade", back_populates="loss_analyses")
+
+
+class BacktestRun(Base):
+    """
+    Record of a historical backtest simulation run.
+
+    Stores metrics and parameters for each backtest for comparison and audit.
+    """
+
+    __tablename__ = "backtest_runs"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
+    start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    trade_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    brier_score: Mapped[Decimal | None] = mapped_column(Numeric, nullable=True)
+    sharpe_ratio: Mapped[Decimal | None] = mapped_column(Numeric, nullable=True)
+    win_rate: Mapped[Decimal | None] = mapped_column(Numeric, nullable=True)
+    profit_factor: Mapped[Decimal | None] = mapped_column(Numeric, nullable=True)
+    parameters: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
+
+    __table_args__ = (
+        Index("ix_backtest_runs_run_at", "run_at"),
     )
