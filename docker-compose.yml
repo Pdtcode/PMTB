@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pmtb
+      POSTGRES_USER: pmtb
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pmtb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    ports:
+      - "5432:5432"  # Exposed for local dev; remove in production
+
+  pmtb:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://pmtb:${POSTGRES_PASSWORD}@postgres:5432/pmtb
+      KALSHI_API_KEY_ID: ${KALSHI_API_KEY_ID}
+      KALSHI_PRIVATE_KEY_PATH: /run/secrets/kalshi_key
+      TRADING_MODE: ${TRADING_MODE:-paper}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./secrets:/run/secrets:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+volumes:
+  pgdata:
