@@ -87,7 +87,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PERF-01**: System tracks Brier score across all resolved predictions
 - [x] **PERF-02**: System tracks Sharpe ratio of the portfolio
 - [x] **PERF-03**: System tracks win rate and profit factor
-- [ ] **PERF-04**: System classifies losing trades by error type (wrong signal weighting, LLM error, edge decay, etc.)
+- [x] **PERF-04**: System classifies losing trades by error type (wrong signal weighting, LLM error, edge decay, etc.)
 - [ ] **PERF-05**: Model learning loop feeds resolved outcomes back into XGBoost retraining pipeline
 - [ ] **PERF-06**: Learning loop triggers retraining when Brier score degrades beyond threshold
 - [ ] **PERF-07**: Backtesting engine validates strategies against historical market data
@@ -191,7 +191,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERF-01 | Phase 7 | Complete |
 | PERF-02 | Phase 7 | Complete |
 | PERF-03 | Phase 7 | Complete |
-| PERF-04 | Phase 7 | Pending |
+| PERF-04 | Phase 7 | Complete |
 | PERF-05 | Phase 7 | Pending |
 | PERF-06 | Phase 7 | Pending |
 | PERF-07 | Phase 7 | Pending |

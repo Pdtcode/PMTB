@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-03-11T21:35:28.205Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-11T21:40:19.009Z"
 last_activity: 2026-03-10 — Executed Plan 01-01 (project scaffolding, DB layer, logging, metrics)
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 24
-  completed_plans: 21
+  completed_plans: 22
   percent: 5
 ---
 
@@ -70,6 +70,7 @@ Progress: [█░░░░░░░░░] 5%
 | Phase 06-execution-integration-and-deployment P03 | 4 min | 2 tasks | 3 files |
 | Phase 06-execution-integration-and-deployment P04 | 2 min | 2 tasks | 6 files |
 | Phase 07-performance-tracking-and-learning-loop P01 | 5 | 2 tasks | 9 files |
+| Phase 07-performance-tracking-and-learning-loop P02 | 3 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,8 @@ Recent decisions affecting current work:
 - [Phase 06-04]: secrets/ volume mounted at /run/secrets:ro — Kalshi RSA key never baked into image
 - [Phase 07]: asyncio.Lock used to prevent concurrent metric writes per Research anti-pattern guidance
 - [Phase 07]: Minimum sample guard of 10 trades prevents misleading metrics from small datasets — all metrics return None below threshold
+- [Phase 07-performance-tracking-and-learning-loop]: Rule priority: edge_decay > signal_error > llm_error > sizing_error > market_shock > unknown — Claude deferred last for cost gating
+- [Phase 07-performance-tracking-and-learning-loop]: market_shock test uses p_market=None to prevent spurious edge_decay match when both prices near 0.5
 
 ### Pending Todos
 
@@ -138,6 +141,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T21:35:20.401Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-03-11T21:40:19.006Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
