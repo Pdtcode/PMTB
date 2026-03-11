@@ -90,8 +90,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PERF-04**: System classifies losing trades by error type (wrong signal weighting, LLM error, edge decay, etc.)
 - [x] **PERF-05**: Model learning loop feeds resolved outcomes back into XGBoost retraining pipeline
 - [x] **PERF-06**: Learning loop triggers retraining when Brier score degrades beyond threshold
-- [ ] **PERF-07**: Backtesting engine validates strategies against historical market data
-- [ ] **PERF-08**: Backtesting uses same model/sizer code paths as live trading (no separate implementation)
+- [x] **PERF-07**: Backtesting engine validates strategies against historical market data
+- [x] **PERF-08**: Backtesting uses same model/sizer code paths as live trading (no separate implementation)
 
 ### Deployment
 
@@ -194,8 +194,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERF-04 | Phase 7 | Complete |
 | PERF-05 | Phase 7 | Complete |
 | PERF-06 | Phase 7 | Complete |
-| PERF-07 | Phase 7 | Pending |
-| PERF-08 | Phase 7 | Pending |
+| PERF-07 | Phase 7 | Complete |
+| PERF-08 | Phase 7 | Complete |
 
 **Coverage:**
 - v1 requirements: 62 total
