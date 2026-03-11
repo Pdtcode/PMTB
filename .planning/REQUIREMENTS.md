@@ -95,9 +95,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Deployment
 
-- [ ] **DEPL-01**: System runs locally for development with single-command startup
-- [ ] **DEPL-02**: System deploys to cloud VPS via Docker for 24/7 operation
-- [ ] **DEPL-03**: Structured JSON logging to stdout for both local and cloud operation
+- [x] **DEPL-01**: System runs locally for development with single-command startup
+- [x] **DEPL-02**: System deploys to cloud VPS via Docker for 24/7 operation
+- [x] **DEPL-03**: Structured JSON logging to stdout for both local and cloud operation
 
 ## v2 Requirements
 
@@ -185,9 +185,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXEC-03 | Phase 6 | Complete |
 | EXEC-04 | Phase 6 | Complete |
 | EXEC-05 | Phase 6 | Complete |
-| DEPL-01 | Phase 6 | Pending |
-| DEPL-02 | Phase 6 | Pending |
-| DEPL-03 | Phase 6 | Pending |
+| DEPL-01 | Phase 6 | Complete |
+| DEPL-02 | Phase 6 | Complete |
+| DEPL-03 | Phase 6 | Complete |
 | PERF-01 | Phase 7 | Pending |
 | PERF-02 | Phase 7 | Pending |
 | PERF-03 | Phase 7 | Pending |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-03-11T02:13:47.032Z"
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-03-11T02:16:28.448Z"
 last_activity: 2026-03-10 — Executed Plan 01-01 (project scaffolding, DB layer, logging, metrics)
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 20
-  completed_plans: 19
+  completed_plans: 20
   percent: 5
 ---
 
@@ -68,6 +68,7 @@ Progress: [█░░░░░░░░░] 5%
 | Phase 06-execution-integration-and-deployment P01 | 4 min | 2 tasks | 8 files |
 | Phase 06-execution-integration-and-deployment P02 | 2 | 1 tasks | 2 files |
 | Phase 06-execution-integration-and-deployment P03 | 4 min | 2 tasks | 3 files |
+| Phase 06-execution-integration-and-deployment P04 | 2 min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,8 @@ Recent decisions affecting current work:
 - [Phase 06-03]: asyncio.wait_for on stop_event.wait(timeout=scan_interval) for interruptible cycle sleep
 - [Phase 06-03]: asyncio.Queue for WS price event injection — decouples WS handler from decision pipeline
 - [Phase 06-03]: _last_predictions/_last_candidates cache avoids re-running full pipeline on WS events
+- [Phase 06-04]: Multi-stage Dockerfile uses python:3.13-slim for builder and runtime — asyncpg binary compatibility (Alpine musl libc breaks asyncpg)
+- [Phase 06-04]: secrets/ volume mounted at /run/secrets:ro — Kalshi RSA key never baked into image
 
 ### Pending Todos
 
@@ -132,6 +135,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:13:47.030Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-03-11T02:16:28.446Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
