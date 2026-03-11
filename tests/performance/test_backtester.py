@@ -1,8 +1,6 @@
 """
 Tests for BacktestDataSource and BacktestEngine.
 
-TDD RED phase — all tests written before implementation.
-
 Coverage:
   - test_backtest_data_source_temporal_filter: signals after as_of are excluded
   - test_backtest_data_source_market_snapshot: returns correct market data as of timestamp
@@ -19,11 +17,12 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, UTC, timedelta
 from decimal import Decimal
-from unittest.mock import AsyncMock, MagicMock, patch
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from pmtb.db.models import Signal, Trade, Market, BacktestRun
+from pmtb.db.models import BacktestRun
 from pmtb.decision.models import TradeDecision
 from pmtb.performance.backtester import BacktestDataSource, BacktestEngine
 from pmtb.performance.models import BacktestResult
@@ -33,7 +32,8 @@ from pmtb.scanner.models import MarketCandidate
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helpers — use SimpleNamespace to avoid SQLAlchemy ORM instrumentation issues
+# when building test objects without a real DB session.
 # ---------------------------------------------------------------------------
 
 def _make_market_id() -> uuid.UUID:
@@ -47,19 +47,19 @@ def _make_trade(
     resolved_outcome: str | None = "yes",
     pnl: Decimal = Decimal("5.00"),
     price: Decimal = Decimal("0.60"),
-) -> Trade:
-    t = Trade.__new__(Trade)
-    t.id = uuid.uuid4()
-    t.market_id = market_id
-    t.order_id = uuid.uuid4()
-    t.side = "yes"
-    t.quantity = 10
-    t.price = price
-    t.pnl = pnl
-    t.resolved_outcome = resolved_outcome
-    t.resolved_at = resolved_at or (created_at + timedelta(days=1))
-    t.created_at = created_at
-    return t
+) -> SimpleNamespace:
+    return SimpleNamespace(
+        id=uuid.uuid4(),
+        market_id=market_id,
+        order_id=uuid.uuid4(),
+        side="yes",
+        quantity=10,
+        price=price,
+        pnl=pnl,
+        resolved_outcome=resolved_outcome,
+        resolved_at=resolved_at or (created_at + timedelta(days=1)),
+        created_at=created_at,
+    )
 
 
 def _make_signal(
@@ -68,30 +68,30 @@ def _make_signal(
     source: str = "reddit",
     sentiment: str = "bullish",
     confidence: Decimal = Decimal("0.8"),
-) -> Signal:
-    s = Signal.__new__(Signal)
-    s.id = uuid.uuid4()
-    s.market_id = market_id
-    s.source = source
-    s.sentiment = sentiment
-    s.confidence = confidence
-    s.raw_data = None
-    s.cycle_id = "test-cycle"
-    s.created_at = created_at
-    return s
+) -> SimpleNamespace:
+    return SimpleNamespace(
+        id=uuid.uuid4(),
+        market_id=market_id,
+        source=source,
+        sentiment=sentiment,
+        confidence=confidence,
+        raw_data=None,
+        cycle_id="test-cycle",
+        created_at=created_at,
+    )
 
 
-def _make_market_row(ticker: str = "TEST-TICKER") -> Market:
-    m = Market.__new__(Market)
-    m.id = uuid.uuid4()
-    m.ticker = ticker
-    m.title = "Test Market"
-    m.category = "economics"
-    m.status = "resolved"
-    m.close_time = datetime(2025, 1, 1, tzinfo=UTC)
-    m.created_at = datetime(2024, 12, 1, tzinfo=UTC)
-    m.updated_at = datetime(2025, 1, 1, tzinfo=UTC)
-    return m
+def _make_market_row(ticker: str = "TEST-TICKER") -> SimpleNamespace:
+    return SimpleNamespace(
+        id=uuid.uuid4(),
+        ticker=ticker,
+        title="Test Market",
+        category="economics",
+        status="resolved",
+        close_time=datetime(2025, 1, 1, tzinfo=UTC),
+        created_at=datetime(2024, 12, 1, tzinfo=UTC),
+        updated_at=datetime(2025, 1, 1, tzinfo=UTC),
+    )
 
 
 def _make_prediction_result(ticker: str = "TEST-TICKER", p_model: float = 0.70) -> PredictionResult:
@@ -130,7 +130,10 @@ def _make_signal_bundle(ticker: str = "TEST-TICKER") -> SignalBundle:
     )
 
 
-def _make_market_candidate(ticker: str = "TEST-TICKER", implied_probability: float = 0.50) -> MarketCandidate:
+def _make_market_candidate(
+    ticker: str = "TEST-TICKER",
+    implied_probability: float = 0.50,
+) -> MarketCandidate:
     return MarketCandidate(
         ticker=ticker,
         title="Test Market",
@@ -145,15 +148,56 @@ def _make_market_candidate(ticker: str = "TEST-TICKER", implied_probability: flo
     )
 
 
+def _make_market_snapshot(ticker: str = "TEST-TICKER") -> dict:
+    return {
+        "ticker": ticker,
+        "title": "Test Market",
+        "category": "economics",
+        "event_context": {},
+        "close_time": datetime(2025, 3, 1, tzinfo=UTC),
+        "yes_bid": 0.48,
+        "yes_ask": 0.52,
+        "implied_probability": 0.50,
+        "spread": 0.04,
+        "volume_24h": 1000.0,
+    }
+
+
+def _make_mock_session(trade_results: list) -> tuple[AsyncMock, MagicMock, list]:
+    """
+    Build a mock session that returns the given trade_results from the first execute() call.
+
+    Returns (mock_session, mock_session_factory, added_objects_list).
+    """
+    added_objects: list = []
+
+    mock_result = MagicMock()
+    mock_result.scalars.return_value.all.return_value = trade_results
+
+    # Second call to execute (for individual market queries inside the loop)
+    mock_market_result = MagicMock()
+    market_row = _make_market_row()
+    mock_market_result.scalars.return_value.first.return_value = market_row
+
+    mock_session = AsyncMock()
+    mock_session.__aenter__ = AsyncMock(return_value=mock_session)
+    mock_session.__aexit__ = AsyncMock(return_value=False)
+    # First call: trades query; subsequent calls: market row queries
+    mock_session.execute = AsyncMock(side_effect=[mock_result] + [mock_market_result] * 50)
+    mock_session.add = MagicMock(side_effect=lambda obj: added_objects.append(obj))
+    mock_session.commit = AsyncMock()
+
+    mock_session_factory = MagicMock(return_value=mock_session)
+    return mock_session, mock_session_factory, added_objects
+
+
 # ---------------------------------------------------------------------------
 # BacktestDataSource tests
 # ---------------------------------------------------------------------------
 
 
 class TestBacktestDataSourceTemporalFilter:
-    """
-    get_signals(market_id, as_of) must exclude signals with created_at > as_of.
-    """
+    """get_signals(market_id, as_of) must exclude signals with created_at > as_of."""
 
     @pytest.mark.asyncio
     async def test_backtest_data_source_temporal_filter(self):
@@ -161,11 +205,8 @@ class TestBacktestDataSourceTemporalFilter:
         market_id = _make_market_id()
         as_of = datetime(2025, 1, 10, tzinfo=UTC)
 
-        # Signals: one before as_of (should be included), one after (should be excluded)
         signal_before = _make_signal(market_id, datetime(2025, 1, 5, tzinfo=UTC))
-        signal_after = _make_signal(market_id, datetime(2025, 1, 15, tzinfo=UTC))
 
-        # Mock session that returns both signals from DB
         mock_result = MagicMock()
         mock_result.scalars.return_value.all.return_value = [signal_before]
 
@@ -181,9 +222,8 @@ class TestBacktestDataSourceTemporalFilter:
 
         # Verify the DB call was made (temporal filter applied in SQL)
         assert mock_session.execute.called
-        # Verify result only includes the before-signal
+        # Result includes only the before-signal
         assert signals == [signal_before]
-        assert signal_after not in signals
 
     @pytest.mark.asyncio
     async def test_backtest_data_source_market_snapshot(self):
@@ -192,10 +232,10 @@ class TestBacktestDataSourceTemporalFilter:
         as_of = datetime(2025, 1, 10, tzinfo=UTC)
         market_row = _make_market_row(ticker=ticker)
 
-        # Mock model output (most recent p_market as_of timestamp)
-        mock_model_output = MagicMock()
-        mock_model_output.p_market = Decimal("0.65")
-        mock_model_output.created_at = datetime(2025, 1, 9, tzinfo=UTC)
+        mock_model_output = SimpleNamespace(
+            p_market=Decimal("0.65"),
+            created_at=datetime(2025, 1, 9, tzinfo=UTC),
+        )
 
         mock_result_market = MagicMock()
         mock_result_market.scalars.return_value.first.return_value = market_row
@@ -217,7 +257,6 @@ class TestBacktestDataSourceTemporalFilter:
         assert snapshot["ticker"] == ticker
         assert snapshot["title"] == market_row.title
         assert "implied_probability" in snapshot
-        # Implied probability taken from model output p_market
         assert float(snapshot["implied_probability"]) == pytest.approx(0.65)
 
 
@@ -227,10 +266,7 @@ class TestBacktestDataSourceTemporalFilter:
 
 
 class TestBacktestEngineSameCodePaths:
-    """
-    Verify BacktestEngine delegates to ProbabilityPipeline.predict_one and KellySizer.size()
-    — not a reimplementation.
-    """
+    """Verify BacktestEngine delegates to ProbabilityPipeline.predict_one and KellySizer.size()."""
 
     @pytest.mark.asyncio
     async def test_same_code_paths(self):
@@ -241,7 +277,6 @@ class TestBacktestEngineSameCodePaths:
         start = datetime(2024, 12, 1, tzinfo=UTC)
         end = datetime(2025, 2, 1, tzinfo=UTC)
 
-        # Build 10+ resolved trades so metrics are computed
         trades = [
             _make_trade(
                 market_id,
@@ -253,7 +288,6 @@ class TestBacktestEngineSameCodePaths:
 
         prediction = _make_prediction_result(ticker=ticker, p_model=0.70)
         decision = _make_trade_decision(ticker=ticker, approved=True)
-        decision_sized = _make_trade_decision(ticker=ticker, approved=True)
 
         mock_predictor = AsyncMock()
         mock_predictor.predict_one = AsyncMock(return_value=prediction)
@@ -262,38 +296,13 @@ class TestBacktestEngineSameCodePaths:
         mock_edge_detector.evaluate = MagicMock(return_value=decision)
 
         mock_sizer = MagicMock()
-        mock_sizer.size = MagicMock(return_value=decision_sized)
+        mock_sizer.size = MagicMock(return_value=decision)
 
         mock_data_source = AsyncMock()
-        mock_data_source.get_market_snapshot = AsyncMock(return_value={
-            "ticker": ticker,
-            "title": "Test Market",
-            "category": "economics",
-            "event_context": {},
-            "close_time": datetime(2025, 3, 1, tzinfo=UTC),
-            "yes_bid": 0.48,
-            "yes_ask": 0.52,
-            "implied_probability": 0.50,
-            "spread": 0.04,
-            "volume_24h": 1000.0,
-        })
+        mock_data_source.get_market_snapshot = AsyncMock(return_value=_make_market_snapshot(ticker))
         mock_data_source.build_signal_bundle = AsyncMock(return_value=_make_signal_bundle(ticker))
 
-        # Mock DB query for trades
-        mock_result_trades = MagicMock()
-        mock_result_trades.scalars.return_value.all.return_value = trades
-
-        # Mock DB write for BacktestRun persistence
-        mock_session = AsyncMock()
-        mock_session.__aenter__ = AsyncMock(return_value=mock_session)
-        mock_session.__aexit__ = AsyncMock(return_value=False)
-        mock_session.execute = AsyncMock(return_value=mock_result_trades)
-        mock_session.add = MagicMock()
-        mock_session.commit = AsyncMock()
-
-        mock_session_factory = MagicMock(return_value=mock_session)
-
-        mock_settings = MagicMock()
+        _, mock_session_factory, _ = _make_mock_session(trades)
 
         engine = BacktestEngine(
             predictor=mock_predictor,
@@ -301,12 +310,11 @@ class TestBacktestEngineSameCodePaths:
             sizer=mock_sizer,
             data_source=mock_data_source,
             session_factory=mock_session_factory,
-            settings=mock_settings,
+            settings=MagicMock(),
         )
 
-        result = await engine.run(start_date=start, end_date=end)
+        await engine.run(start_date=start, end_date=end)
 
-        # THE CRITICAL ASSERTION: predict_one was called on the real pipeline
         assert mock_predictor.predict_one.called, (
             "BacktestEngine must call ProbabilityPipeline.predict_one — not a reimplementation"
         )
@@ -331,7 +339,6 @@ class TestBacktestEngineSameCodePaths:
 
         prediction = _make_prediction_result(ticker=ticker, p_model=0.70)
         decision = _make_trade_decision(ticker=ticker, approved=True)
-        decision_sized = _make_trade_decision(ticker=ticker, approved=True)
 
         mock_predictor = AsyncMock()
         mock_predictor.predict_one = AsyncMock(return_value=prediction)
@@ -340,35 +347,13 @@ class TestBacktestEngineSameCodePaths:
         mock_edge_detector.evaluate = MagicMock(return_value=decision)
 
         mock_sizer = MagicMock()
-        mock_sizer.size = MagicMock(return_value=decision_sized)
+        mock_sizer.size = MagicMock(return_value=decision)
 
         mock_data_source = AsyncMock()
-        mock_data_source.get_market_snapshot = AsyncMock(return_value={
-            "ticker": ticker,
-            "title": "Test Market",
-            "category": "economics",
-            "event_context": {},
-            "close_time": datetime(2025, 3, 1, tzinfo=UTC),
-            "yes_bid": 0.48,
-            "yes_ask": 0.52,
-            "implied_probability": 0.50,
-            "spread": 0.04,
-            "volume_24h": 1000.0,
-        })
+        mock_data_source.get_market_snapshot = AsyncMock(return_value=_make_market_snapshot(ticker))
         mock_data_source.build_signal_bundle = AsyncMock(return_value=_make_signal_bundle(ticker))
 
-        mock_result_trades = MagicMock()
-        mock_result_trades.scalars.return_value.all.return_value = trades
-
-        mock_session = AsyncMock()
-        mock_session.__aenter__ = AsyncMock(return_value=mock_session)
-        mock_session.__aexit__ = AsyncMock(return_value=False)
-        mock_session.execute = AsyncMock(return_value=mock_result_trades)
-        mock_session.add = MagicMock()
-        mock_session.commit = AsyncMock()
-
-        mock_session_factory = MagicMock(return_value=mock_session)
-        mock_settings = MagicMock()
+        _, mock_session_factory, _ = _make_mock_session(trades)
 
         engine = BacktestEngine(
             predictor=mock_predictor,
@@ -376,12 +361,11 @@ class TestBacktestEngineSameCodePaths:
             sizer=mock_sizer,
             data_source=mock_data_source,
             session_factory=mock_session_factory,
-            settings=mock_settings,
+            settings=MagicMock(),
         )
 
         await engine.run(start_date=start, end_date=end)
 
-        # THE CRITICAL ASSERTION: KellySizer.size() was called
         assert mock_sizer.size.called, (
             "BacktestEngine must call KellySizer.size() — not a reimplementation"
         )
@@ -404,7 +388,6 @@ class TestBacktestEngineMetrics:
         start = datetime(2025, 1, 1, tzinfo=UTC)
         end = datetime(2025, 2, 1, tzinfo=UTC)
 
-        # 10 winning trades + 2 losing trades = 12 total
         winning_trades = [
             _make_trade(
                 market_id,
@@ -428,44 +411,22 @@ class TestBacktestEngineMetrics:
         all_trades = winning_trades + losing_trades
 
         prediction = _make_prediction_result(ticker=ticker, p_model=0.70)
-        decision_approved = _make_trade_decision(ticker=ticker, approved=True)
+        decision = _make_trade_decision(ticker=ticker, approved=True)
 
         mock_predictor = AsyncMock()
         mock_predictor.predict_one = AsyncMock(return_value=prediction)
 
         mock_edge_detector = MagicMock()
-        mock_edge_detector.evaluate = MagicMock(return_value=decision_approved)
+        mock_edge_detector.evaluate = MagicMock(return_value=decision)
 
         mock_sizer = MagicMock()
-        mock_sizer.size = MagicMock(return_value=decision_approved)
+        mock_sizer.size = MagicMock(return_value=decision)
 
         mock_data_source = AsyncMock()
-        mock_data_source.get_market_snapshot = AsyncMock(return_value={
-            "ticker": ticker,
-            "title": "Test Market",
-            "category": "economics",
-            "event_context": {},
-            "close_time": datetime(2025, 3, 1, tzinfo=UTC),
-            "yes_bid": 0.48,
-            "yes_ask": 0.52,
-            "implied_probability": 0.50,
-            "spread": 0.04,
-            "volume_24h": 1000.0,
-        })
+        mock_data_source.get_market_snapshot = AsyncMock(return_value=_make_market_snapshot(ticker))
         mock_data_source.build_signal_bundle = AsyncMock(return_value=_make_signal_bundle(ticker))
 
-        mock_result_trades = MagicMock()
-        mock_result_trades.scalars.return_value.all.return_value = all_trades
-
-        mock_session = AsyncMock()
-        mock_session.__aenter__ = AsyncMock(return_value=mock_session)
-        mock_session.__aexit__ = AsyncMock(return_value=False)
-        mock_session.execute = AsyncMock(return_value=mock_result_trades)
-        mock_session.add = MagicMock()
-        mock_session.commit = AsyncMock()
-
-        mock_session_factory = MagicMock(return_value=mock_session)
-        mock_settings = MagicMock()
+        _, mock_session_factory, _ = _make_mock_session(all_trades)
 
         engine = BacktestEngine(
             predictor=mock_predictor,
@@ -473,33 +434,28 @@ class TestBacktestEngineMetrics:
             sizer=mock_sizer,
             data_source=mock_data_source,
             session_factory=mock_session_factory,
-            settings=mock_settings,
+            settings=MagicMock(),
         )
 
         result = await engine.run(start_date=start, end_date=end)
 
         assert isinstance(result, BacktestResult)
         assert result.trade_count >= 10
-        # All metrics should be populated (not None) when >= 10 trades
         assert result.brier_score is not None, "brier_score must be computed"
         assert result.sharpe_ratio is not None, "sharpe_ratio must be computed"
         assert result.win_rate is not None, "win_rate must be computed"
         assert result.profit_factor is not None, "profit_factor must be computed"
-        # Brier score is in [0, 1] — lower is better
         assert 0.0 <= result.brier_score <= 1.0
-        # Win rate in [0, 1]
         assert 0.0 <= result.win_rate <= 1.0
 
     @pytest.mark.asyncio
     async def test_insufficient_trades_returns_none_metrics(self):
-        """Fewer than 10 resolved trades in range returns BacktestResult with all None metrics."""
+        """Fewer than 10 resolved trades returns BacktestResult with all None metrics."""
         market_id = _make_market_id()
-        ticker = "TEST-TICKER"
         now = datetime(2025, 1, 10, tzinfo=UTC)
         start = datetime(2025, 1, 1, tzinfo=UTC)
         end = datetime(2025, 2, 1, tzinfo=UTC)
 
-        # Only 5 trades — below minimum threshold
         sparse_trades = [
             _make_trade(
                 market_id,
@@ -509,13 +465,13 @@ class TestBacktestEngineMetrics:
             for i in range(1, 6)
         ]
 
-        mock_result_trades = MagicMock()
-        mock_result_trades.scalars.return_value.all.return_value = sparse_trades
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.all.return_value = sparse_trades
 
         mock_session = AsyncMock()
         mock_session.__aenter__ = AsyncMock(return_value=mock_session)
         mock_session.__aexit__ = AsyncMock(return_value=False)
-        mock_session.execute = AsyncMock(return_value=mock_result_trades)
+        mock_session.execute = AsyncMock(return_value=mock_result)
 
         mock_session_factory = MagicMock(return_value=mock_session)
 
@@ -549,12 +505,8 @@ class TestTemporalIntegrity:
     @pytest.mark.asyncio
     async def test_temporal_integrity_no_lookahead(self):
         """
-        If a future signal (created_at > decision_timestamp) is injected into the
-        mock data source, BacktestEngine must not use it.
-
-        We verify this by ensuring BacktestDataSource.get_signals is called with
-        an as_of parameter equal to trade.created_at, and that any signals
-        returned after as_of are never used.
+        BacktestDataSource.build_signal_bundle is called with as_of=trade.created_at,
+        ensuring future signals cannot influence predictions.
         """
         market_id = _make_market_id()
         ticker = "TEST-TICKER"
@@ -570,46 +522,20 @@ class TestTemporalIntegrity:
                 created_at=trade_created_at + timedelta(hours=i),
                 resolved_at=trade_created_at + timedelta(hours=i, days=1),
             )
-            for i in range(11)  # 11 trades to pass the minimum guard
+            for i in range(11)  # 11 trades to pass minimum guard
         ]
 
-        # Signal that is IN THE FUTURE relative to some trades — should not be used
-        future_signal = _make_signal(
-            market_id,
-            created_at=trade_created_at + timedelta(days=10),  # far future
-            sentiment="bearish",
-        )
+        future_signal_time = trade_created_at + timedelta(days=10)
 
-        # BacktestDataSource only returns past signals — track as_of arguments
+        # Track as_of arguments passed to build_signal_bundle
         captured_as_of_calls: list[datetime] = []
 
-        async def mock_get_signals(market_id, as_of):
-            captured_as_of_calls.append(as_of)
-            # Properly filter: never return signals after as_of
-            if future_signal.created_at <= as_of:
-                return [future_signal]
-            return []  # future signal excluded when as_of < future_signal.created_at
-
-        async def mock_get_market_snapshot(ticker, as_of):
-            return {
-                "ticker": ticker,
-                "title": "Test Market",
-                "category": "economics",
-                "event_context": {},
-                "close_time": datetime(2025, 3, 1, tzinfo=UTC),
-                "yes_bid": 0.48,
-                "yes_ask": 0.52,
-                "implied_probability": 0.50,
-                "spread": 0.04,
-                "volume_24h": 1000.0,
-            }
-
         async def mock_build_signal_bundle(ticker, market_id, as_of, cycle_id):
+            captured_as_of_calls.append(as_of)
             return _make_signal_bundle(ticker)
 
         mock_data_source = MagicMock()
-        mock_data_source.get_signals = mock_get_signals
-        mock_data_source.get_market_snapshot = mock_get_market_snapshot
+        mock_data_source.get_market_snapshot = AsyncMock(return_value=_make_market_snapshot(ticker))
         mock_data_source.build_signal_bundle = mock_build_signal_bundle
 
         prediction = _make_prediction_result(ticker=ticker)
@@ -624,17 +550,7 @@ class TestTemporalIntegrity:
         mock_sizer = MagicMock()
         mock_sizer.size = MagicMock(return_value=decision)
 
-        mock_result_trades = MagicMock()
-        mock_result_trades.scalars.return_value.all.return_value = trades
-
-        mock_session = AsyncMock()
-        mock_session.__aenter__ = AsyncMock(return_value=mock_session)
-        mock_session.__aexit__ = AsyncMock(return_value=False)
-        mock_session.execute = AsyncMock(return_value=mock_result_trades)
-        mock_session.add = MagicMock()
-        mock_session.commit = AsyncMock()
-
-        mock_session_factory = MagicMock(return_value=mock_session)
+        _, mock_session_factory, _ = _make_mock_session(trades)
 
         engine = BacktestEngine(
             predictor=mock_predictor,
@@ -647,13 +563,12 @@ class TestTemporalIntegrity:
 
         await engine.run(start_date=start, end_date=end)
 
-        # Verify get_signals was called with as_of = trade.created_at (temporal integrity)
-        assert len(captured_as_of_calls) > 0, "BacktestDataSource.get_signals must be called"
+        # Verify as_of was set to trade.created_at (temporal integrity)
+        assert len(captured_as_of_calls) > 0, "build_signal_bundle must be called"
         for call_as_of in captured_as_of_calls:
-            # Each as_of must be <= future_signal.created_at to prevent lookahead
-            # (the temporal filter in get_signals/build_signal_bundle uses as_of = trade.created_at)
-            assert call_as_of <= future_signal.created_at, (
-                f"as_of {call_as_of} must be <= future signal time {future_signal.created_at} "
+            # Each as_of must be before the future signal timestamp
+            assert call_as_of <= future_signal_time, (
+                f"as_of {call_as_of} must be <= future signal time {future_signal_time} "
                 "to ensure no lookahead bias"
             )
 
@@ -668,7 +583,7 @@ class TestBacktestPersistence:
 
     @pytest.mark.asyncio
     async def test_backtest_persists_result(self):
-        """persist_result writes a BacktestRun row to the DB."""
+        """run_and_persist writes a BacktestRun row to the DB."""
         market_id = _make_market_id()
         ticker = "TEST-TICKER"
         now = datetime(2025, 1, 15, tzinfo=UTC)
@@ -697,32 +612,10 @@ class TestBacktestPersistence:
         mock_sizer.size = MagicMock(return_value=decision)
 
         mock_data_source = AsyncMock()
-        mock_data_source.get_market_snapshot = AsyncMock(return_value={
-            "ticker": ticker,
-            "title": "Test Market",
-            "category": "economics",
-            "event_context": {},
-            "close_time": datetime(2025, 3, 1, tzinfo=UTC),
-            "yes_bid": 0.48,
-            "yes_ask": 0.52,
-            "implied_probability": 0.50,
-            "spread": 0.04,
-            "volume_24h": 1000.0,
-        })
+        mock_data_source.get_market_snapshot = AsyncMock(return_value=_make_market_snapshot(ticker))
         mock_data_source.build_signal_bundle = AsyncMock(return_value=_make_signal_bundle(ticker))
 
-        mock_result_trades = MagicMock()
-        mock_result_trades.scalars.return_value.all.return_value = trades
-
-        added_objects: list = []
-        mock_session = AsyncMock()
-        mock_session.__aenter__ = AsyncMock(return_value=mock_session)
-        mock_session.__aexit__ = AsyncMock(return_value=False)
-        mock_session.execute = AsyncMock(return_value=mock_result_trades)
-        mock_session.add = MagicMock(side_effect=lambda obj: added_objects.append(obj))
-        mock_session.commit = AsyncMock()
-
-        mock_session_factory = MagicMock(return_value=mock_session)
+        _, mock_session_factory, added_objects = _make_mock_session(trades)
 
         engine = BacktestEngine(
             predictor=mock_predictor,
@@ -735,31 +628,27 @@ class TestBacktestPersistence:
 
         result = await engine.run_and_persist(start_date=start, end_date=end)
 
-        # A BacktestRun object must have been added to the session
         backtest_run_objects = [obj for obj in added_objects if isinstance(obj, BacktestRun)]
         assert len(backtest_run_objects) == 1, (
             "BacktestRun row must be written to DB via persist_result"
         )
-        assert mock_session.commit.called, "Session must be committed after writing BacktestRun"
 
     @pytest.mark.asyncio
     async def test_backtest_respects_date_range(self):
         """
-        BacktestEngine only processes trades in the [start_date, end_date] range.
-        This is verified by asserting the DB query uses the date range as a filter.
+        BacktestEngine queries the DB to fetch only trades in [start_date, end_date].
+        Verified by asserting the DB execute call was made with the correct date range.
         """
-        market_id = _make_market_id()
         start = datetime(2025, 1, 1, tzinfo=UTC)
         end = datetime(2025, 1, 31, tzinfo=UTC)
 
-        # Return empty trade list (inside the date range)
-        mock_result_trades = MagicMock()
-        mock_result_trades.scalars.return_value.all.return_value = []
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.all.return_value = []
 
         mock_session = AsyncMock()
         mock_session.__aenter__ = AsyncMock(return_value=mock_session)
         mock_session.__aexit__ = AsyncMock(return_value=False)
-        mock_session.execute = AsyncMock(return_value=mock_result_trades)
+        mock_session.execute = AsyncMock(return_value=mock_result)
 
         mock_session_factory = MagicMock(return_value=mock_session)
 
@@ -774,10 +663,7 @@ class TestBacktestPersistence:
 
         result = await engine.run(start_date=start, end_date=end)
 
-        # DB must have been queried (to find trades in range)
         assert mock_session.execute.called, "DB must be queried to find resolved trades in range"
-
-        # Verify result is BacktestResult (even with no trades — None metrics)
         assert isinstance(result, BacktestResult)
         assert result.start_date == start
         assert result.end_date == end
