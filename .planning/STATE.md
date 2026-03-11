@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-03-11T02:07:44.638Z"
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-03-11T02:13:47.032Z"
 last_activity: 2026-03-10 — Executed Plan 01-01 (project scaffolding, DB layer, logging, metrics)
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 20
-  completed_plans: 18
+  completed_plans: 19
   percent: 5
 ---
 
@@ -67,6 +67,7 @@ Progress: [█░░░░░░░░░] 5%
 | Phase 05-decision-layer P03 | 4 | 2 tasks | 4 files |
 | Phase 06-execution-integration-and-deployment P01 | 4 min | 2 tasks | 8 files |
 | Phase 06-execution-integration-and-deployment P02 | 2 | 1 tasks | 2 files |
+| Phase 06-execution-integration-and-deployment P03 | 4 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,9 @@ Recent decisions affecting current work:
 - [Phase 06-01]: PaperOrderExecutor session_factory optional — None = legacy in-memory mode, backward compatible
 - [Phase 06-02]: asyncio.wait_for(stop_event.wait()) for interruptible polling loops — clean shutdown
 - [Phase 06-02]: REST cancel exception caught broadly — avoids coupling to Kalshi client internals
+- [Phase 06-03]: asyncio.wait_for on stop_event.wait(timeout=scan_interval) for interruptible cycle sleep
+- [Phase 06-03]: asyncio.Queue for WS price event injection — decouples WS handler from decision pipeline
+- [Phase 06-03]: _last_predictions/_last_candidates cache avoids re-running full pipeline on WS events
 
 ### Pending Todos
 
@@ -128,6 +132,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:07:44.635Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-03-11T02:13:47.030Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
