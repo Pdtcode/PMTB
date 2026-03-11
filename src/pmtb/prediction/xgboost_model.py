@@ -74,13 +74,21 @@ class XGBoostPredictor:
             return "shadow-xgb-v0"
         return f"xgb-v1-{self._calibration_method}-{self._train_timestamp}"
 
-    def train(self, X: np.ndarray, y: np.ndarray) -> dict[str, float]:
+    def train(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        sample_weight: np.ndarray | None = None,
+    ) -> dict[str, float]:
         """
         Train a calibrated XGBoost classifier.
 
         Args:
             X: Feature matrix of shape (n_samples, n_features). NaN values are allowed.
             y: Binary label vector of shape (n_samples,). Values should be 0 or 1.
+            sample_weight: Optional per-sample weights of shape (n_samples,).
+                When None, all samples are weighted equally (backward compatible).
+                Used for recency-weighted retraining in LearningLoop.
 
         Returns:
             dict with keys "brier_calibrated" and "brier_raw" for logging.
@@ -103,9 +111,9 @@ class XGBoostPredictor:
             missing=float("nan"),
             random_state=42,
         )
-        raw_clf.fit(X, y)
+        raw_clf.fit(X, y, sample_weight=sample_weight)
         y_prob_raw = raw_clf.predict_proba(X)[:, 1]
-        brier_raw = float(brier_score_loss(y, y_prob_raw))
+        brier_raw = float(brier_score_loss(y, y_prob_raw, sample_weight=sample_weight))
 
         # Calibrated classifier
         base_clf = XGBClassifier(
@@ -120,7 +128,7 @@ class XGBoostPredictor:
             method=self._calibration_method,
             cv=5,
         )
-        calibrated.fit(X, y)
+        calibrated.fit(X, y, sample_weight=sample_weight)
         y_prob_calibrated = calibrated.predict_proba(X)[:, 1]
         brier_calibrated = float(brier_score_loss(y, y_prob_calibrated))
 
