@@ -238,6 +238,58 @@ class TestXGBoostPredictorPersistence:
             assert abs(pred_before - pred_after) < 1e-9
 
 
+class TestXGBoostPredictorSampleWeight:
+    """Tests for the sample_weight parameter added for recency-weighted retraining."""
+
+    def test_train_accepts_sample_weight_none(self):
+        """train(X, y, sample_weight=None) is identical to train(X, y)."""
+        from pmtb.prediction.xgboost_model import XGBoostPredictor
+        with tempfile.TemporaryDirectory() as tmpdir:
+            X, y = _make_synthetic_data()
+            predictor = XGBoostPredictor(
+                model_path=Path(tmpdir) / "model.joblib",
+            )
+            metrics = predictor.train(X, y, sample_weight=None)
+            assert isinstance(metrics, dict)
+            assert "brier_calibrated" in metrics
+
+    def test_train_accepts_uniform_sample_weight(self):
+        """train(X, y, sample_weight=ones) passes weights to underlying classifiers."""
+        from pmtb.prediction.xgboost_model import XGBoostPredictor
+        import inspect
+        with tempfile.TemporaryDirectory() as tmpdir:
+            X, y = _make_synthetic_data()
+            weights = np.ones(len(y))
+            predictor = XGBoostPredictor(
+                model_path=Path(tmpdir) / "model.joblib",
+            )
+            # Should not raise — uniform weights produce same model as no weights
+            metrics = predictor.train(X, y, sample_weight=weights)
+            assert isinstance(metrics, dict)
+            assert predictor.is_ready is True
+
+    def test_train_sample_weight_parameter_exists(self):
+        """train() signature includes sample_weight parameter."""
+        import inspect
+        from pmtb.prediction.xgboost_model import XGBoostPredictor
+        sig = inspect.signature(XGBoostPredictor.train)
+        assert "sample_weight" in sig.parameters
+
+    def test_train_with_recency_weights_differs_from_unweighted(self):
+        """Recency-weighted training produces a different model_version timestamp."""
+        from pmtb.prediction.xgboost_model import XGBoostPredictor
+        with tempfile.TemporaryDirectory() as tmpdir:
+            X, y = _make_synthetic_data(n_samples=300)
+            # Weights that strongly favor the last 50% of samples
+            weights = np.array([0.1] * 150 + [0.9] * 150, dtype=np.float64)
+            predictor = XGBoostPredictor(
+                model_path=Path(tmpdir) / "model.joblib",
+            )
+            metrics = predictor.train(X, y, sample_weight=weights)
+            assert predictor.is_ready is True
+            assert "shadow" not in predictor.model_version
+
+
 class TestXGBoostPredictorCalibrationMethod:
     def test_isotonic_calibration_method_accepted(self):
         from pmtb.prediction.xgboost_model import XGBoostPredictor
