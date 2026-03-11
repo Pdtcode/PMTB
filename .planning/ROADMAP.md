@@ -110,7 +110,12 @@ Plans:
   3. Every order, fill, and cancellation is persisted to PostgreSQL and queryable after the cycle completes
   4. `docker compose up` starts the full system (bot + PostgreSQL) locally with a single command; the system starts and begins scan cycles
   5. The Docker image deploys to a cloud VPS and the bot runs 24/7 with structured JSON logs confirming each scan cycle
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 06-01-PLAN.md — OrderRepository, enhanced PaperOrderExecutor, is_paper migration, Settings additions
+- [ ] 06-02-PLAN.md — FillTracker with WS fills, stale cancellation, REST polling fallback
+- [ ] 06-03-PLAN.md — PipelineOrchestrator and main.py wiring
+- [ ] 06-04-PLAN.md — Docker deployment (Dockerfile, docker-compose, .env.example)
 
 ### Phase 7: Performance Tracking and Learning Loop
 **Goal**: The system knows whether its predictions are improving or degrading — Brier score, Sharpe ratio, and win rate are computed on resolved trades, losing trades are classified by error type, and the XGBoost model is automatically retrained when calibration degrades, with a backtesting engine validating strategy changes before deployment
@@ -135,5 +140,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Research Signal Pipeline | 4/4 | Complete   | 2026-03-10 |
 | 4. Probability Model | 3/3 | Complete   | 2026-03-10 |
 | 5. Decision Layer | 3/3 | Complete   | 2026-03-10 |
-| 6. Execution, Integration, and Deployment | 0/TBD | Not started | - |
+| 6. Execution, Integration, and Deployment | 0/4 | Planning complete | - |
 | 7. Performance Tracking and Learning Loop | 0/TBD | Not started | - |
