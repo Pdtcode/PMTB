@@ -77,9 +77,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Trade Execution
 
 - [x] **EXEC-01**: System places limit orders on Kalshi via REST API
-- [ ] **EXEC-02**: System handles partial fills and tracks fill status
-- [ ] **EXEC-03**: System monitors slippage between expected and actual execution price
-- [ ] **EXEC-04**: System cancels stale unfilled orders after configurable timeout
+- [x] **EXEC-02**: System handles partial fills and tracks fill status
+- [x] **EXEC-03**: System monitors slippage between expected and actual execution price
+- [x] **EXEC-04**: System cancels stale unfilled orders after configurable timeout
 - [x] **EXEC-05**: Every order, fill, and cancellation is persisted to PostgreSQL
 
 ### Performance & Learning
@@ -181,9 +181,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RISK-07 | Phase 5 | Complete |
 | RISK-08 | Phase 5 | Complete |
 | EXEC-01 | Phase 6 | Complete |
-| EXEC-02 | Phase 6 | Pending |
-| EXEC-03 | Phase 6 | Pending |
-| EXEC-04 | Phase 6 | Pending |
+| EXEC-02 | Phase 6 | Complete |
+| EXEC-03 | Phase 6 | Complete |
+| EXEC-04 | Phase 6 | Complete |
 | EXEC-05 | Phase 6 | Complete |
 | DEPL-01 | Phase 6 | Pending |
 | DEPL-02 | Phase 6 | Pending |
