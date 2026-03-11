@@ -126,7 +126,7 @@ Plans:
   2. Each losing trade is classified by error type (wrong signal weighting, LLM error, edge decay, etc.) and the classification is persisted
   3. When Brier score degrades beyond the configured threshold, the learning loop automatically triggers XGBoost retraining on recent resolved trade data and logs the retraining event
   4. The backtesting engine runs the same predictor and sizer code paths against historical data with a swapped data source; temporal integrity is enforced (no feature timestamps after decision timestamp)
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 Plans:
 - [ ] 07-01-PLAN.md — Type contracts, DB models, migration, MetricsService (Brier, Sharpe, win rate, profit factor)
 - [ ] 07-02-PLAN.md — LossClassifier with rule-based heuristics and Claude fallback
@@ -146,4 +146,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. Probability Model | 3/3 | Complete   | 2026-03-10 |
 | 5. Decision Layer | 3/3 | Complete   | 2026-03-10 |
 | 6. Execution, Integration, and Deployment | 4/4 | Complete   | 2026-03-11 |
-| 7. Performance Tracking and Learning Loop | 0/4 | Planning complete | - |
+| 7. Performance Tracking and Learning Loop | 1/4 | In Progress|  |
