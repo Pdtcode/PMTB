@@ -155,6 +155,24 @@ class Settings(BaseSettings):
         description="RSS feed URLs by market category",
     )
 
+    # --- Execution settings ---
+    stale_order_timeout_seconds: int = Field(
+        default=900,
+        description="Seconds before unfilled order is cancelled",
+    )
+    price_offset_cents: int = Field(
+        default=1,
+        description="Limit order price offset in cents from best ask/bid",
+    )
+    portfolio_value: float = Field(
+        default=10000.0,
+        description="Initial portfolio value in dollars",
+    )
+    stage_timeout_seconds: float = Field(
+        default=120.0,
+        description="Max seconds per pipeline stage before timeout",
+    )
+
     # --- Risk management settings (decision layer) ---
     max_exposure: float = Field(
         default=0.80,

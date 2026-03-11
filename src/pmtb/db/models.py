@@ -108,6 +108,7 @@ class Order(Base):
     )
     fill_price: Mapped[Decimal | None] = mapped_column(Numeric, nullable=True)
     filled_quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_paper: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     placed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
